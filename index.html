@@ -1,2040 +1,471 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>個人行程表</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <title>北歐奶茶風 旗艦綜合平面圖 - 名人世界專屬</title>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            background-color: #f8f9fa; 
+        :root {
+            /* 空間與材質色彩 (北歐奶茶風) */
+            --bg-color: #fcfbf9;
+            --wall-color: #8c7f75;      /* 牆壁：奶茶灰棕 */
+            --wet-wall: #706359;        /* 共用水牆加深標示 */
+            --balcony-floor: #e3ddd5;   
+            --floor-wood: #f8f4ef;      /* 燕麥奶白木地板 */
+            --floor-tile: #f0ebe4;      /* 衛浴廚房磁磚 */
+            
+            /* 家具色彩 (奶茶/原木色系) */
+            --furn-wood: #e3d1be;       /* 淺橡木 */
+            --furn-wood-dark: #ccb7a1;  /* 焦糖奶茶色 */
+            --furn-wood-light: #f0e2d1; /* 樺木色 (NORDEN) */
+            --furn-sofa: #cfc7bd;       /* 燕麥灰 (KIVIK) */
+            --furn-bed: #fdfcf9;        /* 奶油白寢具 */
+            --furn-wardrobe: #d9cabd;   /* 奶茶色衣櫃 */
+            --furn-bath: #ffffff;       
+            --furn-kitchen: #e6dfd8;    
+            
+            /* MEP 機電管線標示色彩 */
+            --mep-beam: #f1c40f;        /* 木作假樑範圍 (黃色半透明) */
+            --mep-ac: #3498db;          /* 冷氣 (藍色) */
+            --mep-fresh: #27ae60;       /* 新風機 (綠色) */
+            
+            /* 標註線與文字 */
+            --dim-line: #b0a092;        
+            --text-color: #5c5046;      
         }
-        .calendar-day {
-            min-height: 100px;
-            transition: background-color 0.3s;
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            font-family: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
             display: flex;
             flex-direction: column;
-            position: relative;
-        }
-        .calendar-day:hover {
-            background-color: #e9f5ff !important; 
-        }
-        .calendar-day.today .day-number-display {
-            background-color: #007bff;
-            color: white !important; 
-            border-radius: 50%;
-            width: 28px; 
-            height: 28px; 
-            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-        .day-number-display {
-            font-size: 0.875rem; 
-            padding: 0.25rem; 
-            align-self: flex-start;
+            min-height: 100vh;
         }
 
-        .itinerary-item-display { /* Calendar cell item summary */
-            font-size: 0.7rem;
-            padding: 3px 5px; /* Slightly more padding */
-            margin-top: 3px;
-            border-radius: 4px;
-            text-align: left;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 95%;
-            /* Background color will be set by JS based on item.color */
-        }
-        .itinerary-item-display p { margin: 0; }
-
-        .itinerary-item-count {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            font-size: 0.65rem;
-            background-color: #3b82f6; 
-            color: white;
-            padding: 2px 5px;
-            border-radius: 0.75rem; 
-            line-height: 1;
-        }
-        .modal {
-            display: none; position: fixed; z-index: 100;
-            left: 0; top: 0; width: 100%; height: 100%;
-            overflow: auto; background-color: rgba(0,0,0,0.6); 
-            align-items: center; justify-content: center;
-        }
-        .modal-content { 
-            background-color: #ffffff; margin: auto; padding: 24px; 
-            border: none; 
-            width: 90%; max-width: 500px; 
-            border-radius: 12px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15), 0 6px 10px rgba(0,0,0,0.1); 
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 12px; 
-            margin-bottom: 16px; 
-            border-bottom: 1px solid #e5e7eb; 
-        }
-        .modal-title {
-            font-size: 1.25rem; 
-            font-weight: 600; 
-            color: #1f2937; 
-        }
-        .close-button { 
-            color: #6b7280; 
-            background-color: transparent;
-            border: none;
-            font-size: 1.75rem; 
-            font-weight: bold;
-            line-height: 1;
-            padding: 0.25rem 0.5rem;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .close-button:hover { color: #1f2937; }
-
-        .modal-content::-webkit-scrollbar, #itineraryItemsList::-webkit-scrollbar, #dayTooltipContent::-webkit-scrollbar, #searchResultsList::-webkit-scrollbar, #dayViewEventsList::-webkit-scrollbar, #featureGuideModalContent::-webkit-scrollbar { width: 6px; }
-        .modal-content::-webkit-scrollbar-track, #itineraryItemsList::-webkit-scrollbar-track, #dayTooltipContent::-webkit-scrollbar-track, #searchResultsList::-webkit-scrollbar-track, #dayViewEventsList::-webkit-scrollbar-track, #featureGuideModalContent::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        .modal-content::-webkit-scrollbar-thumb, #itineraryItemsList::-webkit-scrollbar-thumb, #dayTooltipContent::-webkit-scrollbar-thumb, #searchResultsList::-webkit-scrollbar-thumb, #dayViewEventsList::-webkit-scrollbar-thumb, #featureGuideModalContent::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .modal-content::-webkit-scrollbar-thumb:hover, #itineraryItemsList::-webkit-scrollbar-thumb:hover, #dayTooltipContent::-webkit-scrollbar-thumb:hover, #searchResultsList::-webkit-scrollbar-thumb:hover, #dayViewEventsList::-webkit-scrollbar-thumb:hover, #featureGuideModalContent::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        .custom-alert {
-            display: none; position: fixed; top: 20px; left: 50%;
-            transform: translateX(-50%); padding: 16px; 
-            border-radius: 8px; 
-            z-index: 1050;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); min-width: 320px; text-align: center;
-            font-size: 0.875rem; 
-        }
-        .custom-alert.error { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca;} 
-        .custom-alert.success { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; } 
-        .custom-alert.info { background-color: #e0f2fe; color: #075985; border: 1px solid #bae6fd; } 
-        .hidden { display: none !important; }
-        .holiday-info { font-size: 0.7rem; line-height: 1; word-break: break-all; margin-top: auto; text-align: center; padding-top: 2px; color: #c2410c; }
-        .day-content-wrapper { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start; overflow: hidden; }
-        
-        #managementModal .modal-content { max-width: 600px; }
-        #managementModal .modal-title { color: #0369a1; }
-        
-        #itineraryItemModal .modal-content { max-width: 480px; }
-        .itinerary-modal-item { /* List of items inside add/edit modal */
-            display: flex; justify-content: space-between; align-items: flex-start; padding: 10px; 
-            border-radius: 8px; margin-bottom: 8px; background-color: #f8fafc; cursor: grab;
-            border-left-width: 4px; /* For color indicator */
-        }
-        .itinerary-modal-item.dragging { opacity: 0.6; background-color: #dbeafe; }
-        .drag-over { border-top: 2px dashed #60a5fa; }
-        .itinerary-modal-item .item-details { flex-grow: 1; margin-right: 10px; padding-left: 8px; }
-        .itinerary-modal-item .item-description { word-break: break-word; font-weight: 500; color: #334155; }
-        .itinerary-modal-item .item-description p:first-child { margin-top: 0; }
-        .itinerary-modal-item .item-description p:last-child { margin-bottom: 0; }
-        .itinerary-modal-item .item-time { font-size: 0.8rem; color: #475569; }
-        .itinerary-modal-item .item-location { font-size: 0.8rem; color: #15803d; margin-top: 3px; }
-        .itinerary-modal-item .item-tags { font-size: 0.75rem; color: #1d4ed8; margin-top: 3px; }
-        .itinerary-modal-item .item-tags .tag { background-color: #e0e7ff; padding: 2px 5px; border-radius: 4px; margin-right: 4px; display: inline-block;}
-        .itinerary-modal-item .item-actions { display: flex; flex-direction: column; gap: 5px; }
-        .itinerary-modal-item .item-actions button { padding: 5px 10px; font-size: 0.8rem; border-radius: 6px; }
-        .itinerary-modal-item .edit-btn { background-color: #3b82f6; color: white; }
-        .itinerary-modal-item .edit-btn:hover { background-color: #2563eb; }
-        .itinerary-modal-item .delete-btn { background-color: #ef4444; color: white; }
-        .itinerary-modal-item .delete-btn:hover { background-color: #dc2626; }
-
-        .form-input {
-            width: 100%; padding: 0.625rem 0.75rem; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 0.375rem; 
-            font-size: 0.875rem; 
-            color: #334155; 
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .form-input:focus {
-            border-color: #3b82f6; 
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-            outline: none;
-        }
-        .form-label {
-            display: block; text-sm font-medium text-slate-700 mb-1;
-        }
-        .form-button {
-            padding: 0.625rem 1.25rem; font-size: 0.875rem; font-weight: 500;
-            border-radius: 0.375rem; transition: background-color 0.2s;
-            color: white;
-        }
-        .form-button.primary { background-color: #2563eb; }
-        .form-button.primary:hover { background-color: #1d4ed8; }
-        .form-button.secondary { background-color: #64748b; }
-        .form-button.secondary:hover { background-color: #475569; }
-        .form-button.danger { background-color: #dc2626; }
-        .form-button.danger:hover { background-color: #b91c1c; }
-        .form-button.success { background-color: #16a34a; }
-        .form-button.success:hover { background-color: #15803d; }
-        .form-button.warning { background-color: #f59e0b; }
-        .form-button.warning:hover { background-color: #d97706; }
-
-
-        .time-input-group { display: flex; gap: 1rem; margin-top: 0.75rem; margin-bottom: 1rem; }
-        .time-input-group > div { flex: 1; }
-
-        #dayTooltip { position: absolute; display: none; background-color: white; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); padding: 10px; z-index: 50; width: 280px; max-height: 220px; }
-        #dayTooltipContent { max-height: 180px; overflow-y: auto; }
-        .tooltip-item { font-size: 0.8rem; padding: 4px 0; border-bottom: 1px solid #f1f5f9; }
-        .tooltip-item:last-child { border-bottom: none; }
-        .tooltip-item .item-time { font-weight: 600; color: #1e293b; margin-right: 5px; }
-        .tooltip-item .item-description { color: #475569; }
-        .tooltip-item .item-description p:first-child { margin-top: 0; }
-        .tooltip-item .item-description p:last-child { margin-bottom: 0; }
-        .tooltip-item .item-location-tooltip { font-size: 0.75rem; color: #15803d; margin-top: 2px; }
-        .tooltip-item .item-tags-tooltip { font-size: 0.7rem; color: #1d4ed8; margin-top: 2px; }
-        .tooltip-item .item-tags-tooltip .tag { background-color: #e0e7ff; padding: 2px 5px; border-radius: 4px; margin-right: 4px; display: inline-block;}
-        .tooltip-item .item-color-indicator {
-            display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px;
-            vertical-align: middle;
-        }
-        .tooltip-no-items { font-size: 0.8rem; color: #64748b; }
-        
-        #searchResultsModal .modal-content { max-width: 700px; }
-        .search-result-item { padding: 0.75rem; border-bottom: 1px solid #e5e7eb; cursor: pointer; }
-        .search-result-item:hover { background-color: #f9fafb; }
-        .search-result-item:last-child { border-bottom: none; }
-        .search-result-date { font-weight: 600; color: #0369a1; margin-bottom: 0.25rem; }
-        .search-result-description p { margin: 0.1rem 0;}
-
-        #dayViewContainer {
-            background-color: #ffffff; 
-            padding: 24px; 
-            border-radius: 12px; 
-            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-            margin-top: 1.5rem; 
-        }
-        #dayViewDateTitle {
-            font-size: 1.5rem; 
-            font-weight: 700; 
-            color: #111827; 
-            margin-bottom: 1.5rem; 
-            padding-bottom: 0.75rem; 
-            border-bottom: 1px solid #d1d5db; 
-        }
-        #dayViewEventsList {
-            max-height: 65vh; 
-            overflow-y: auto;
-            padding-right: 0.5rem; 
-        }
-        .day-view-item { /* Day view list item */
-            background-color: #f9fafb; 
-            border-radius: 8px; 
-            padding: 1rem; 
-            margin-bottom: 1rem; 
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-            border-left-width: 5px; /* For color indicator */
-            /* Border color will be set by JS */
-        }
-        .day-view-item .item-details { flex-grow: 1; margin-right: 1rem; padding-left: 0.75rem; }
-        .day-view-item .item-description { font-size: 0.95rem; color: #1f2937; }
-        .day-view-item .item-description p { margin: 0.25rem 0; }
-        .day-view-item .item-time { font-size: 0.85rem; color: #047857; font-weight: 500; margin-bottom: 0.25rem; }
-        .day-view-item .item-location { font-size: 0.85rem; color: #4338ca; margin-top: 0.25rem; }
-        .day-view-item .item-tags { font-size: 0.8rem; color: #0284c7; margin-top: 0.25rem; }
-        .day-view-item .item-tags .tag { background-color: #e0f2fe; padding: 2px 6px; border-radius: 4px; margin-right: 4px; display: inline-block;}
-        .day-view-item .item-actions { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end; }
-        .day-view-item .item-actions button {
-            padding: 0.375rem 0.75rem; font-size: 0.8rem; border-radius: 6px; 
-            transition: background-color 0.2s;
-        }
-        .day-view-item .edit-btn { background-color: #3b82f6; color: white; } 
-        .day-view-item .edit-btn:hover { background-color: #2563eb; }
-        .day-view-item .delete-btn { background-color: #ef4444; color: white; } 
-        .day-view-item .delete-btn:hover { background-color: #dc2626; }
-        .day-view-no-items {
+        .header {
             text-align: center;
-            padding: 2.5rem; 
-            font-size: 1rem;
-            color: #6b7280; 
-        }
-        .day-view-controls {
-            margin-top: 1.5rem; 
-            display: flex;
-            justify-content: space-between; 
-            align-items: center;
-            gap: 0.75rem; 
-        }
-        .day-view-controls button { 
-            padding: 0.5rem 1rem; 
-            font-size: 0.875rem; 
-            font-weight: 500;
-            border-radius: 0.375rem; 
-            transition: background-color 0.2s;
-            display: inline-flex;
-            align-items: center;
-        }
-        .day-view-controls .control-group-left {
-            display: flex;
-            gap: 0.75rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
         }
 
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem; 
+        .header h1 {
+            margin: 0 0 5px 0;
+            font-size: 26px;
+            letter-spacing: 2px;
         }
-        .calendar-header-left {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem; 
+
+        .header p {
+            margin: 0;
+            font-size: 14px;
+            color: #8c7f75;
+            line-height: 1.6;
         }
-        .calendar-header-left .user-avatar {
-            width: 36px; height: 36px;
-            background-color: #93c5fd; 
-            border-radius: 50%;
+
+        .legend-container {
             display: flex;
-            align-items: center;
+            flex-wrap: wrap;
             justify-content: center;
-            color: #1e3a8a; 
-            cursor: pointer; 
+            gap: 15px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(180, 170, 160, 0.15);
+            margin-bottom: 20px;
+            max-width: 1200px;
         }
-         .calendar-header-left .user-avatar:hover {
-            background-color: #60a5fa; 
-         }
-         .calendar-header-left .user-avatar i { font-size: 1rem; }
 
-        #monthYearDisplayNav { 
-            font-size: 1.5rem; 
-            font-weight: 600; 
-            color: #1f2937; 
-            cursor: pointer; 
-        }
-         #monthYearDisplayNav:hover { color: #0056b3; }
-
-        .calendar-header-right {
+        .legend-item {
             display: flex;
             align-items: center;
-            gap: 1rem; 
-        }
-        .calendar-header-right button {
-            background-color: transparent;
-            border: none;
-            color: #4b5563; 
-            font-size: 1.25rem; 
-            padding: 0.5rem;
-            border-radius: 50%;
-            transition: background-color 0.2s, color 0.2s;
-        }
-        .calendar-header-right button:hover {
-            background-color: #f3f4f6; 
-            color: #1f2937; 
-        }
-        .calendar-grid-header {
-            display: grid;
-            grid-template-columns: repeat(7, minmax(0, 1fr));
-            gap: 1px; 
-            text-align: center;
-            font-size: 0.75rem; 
-            font-weight: 500; 
-            color: #6b7280; 
-            padding-bottom: 0.5rem; 
-            border-bottom: 1px solid #e5e7eb; 
-            margin-bottom: 0.5rem; 
-        }
-        .blank-day-cell {
-            background-color: #f3f4f6; 
-        }
-        .current-month-day-cell {
-            background-color: #ffffff; 
-        }
-        #featureGuideModalContent ul {
-            list-style-type: disc;
-            margin-left: 1.5rem;
-            space-y: 0.5rem; 
-        }
-        #featureGuideModalContent li {
-            font-size: 0.9rem;
-            color: #374151; 
-        }
-        #featureGuideModalContent li strong {
-            color: #111827; 
+            font-size: 13px;
             font-weight: 600;
-        }
-        /* Color Picker Styles */
-        .color-swatch {
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: transform 0.1s, border-color 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .color-swatch:hover {
-            transform: scale(1.1);
-        }
-        .color-swatch.selected {
-            border-color: #3b82f6; /* Blue-500 for selected state */
-            box-shadow: 0 0 0 2px white, 0 0 0 4px #3b82f6;
-        }
-        .color-swatch.selected i {
-            display: block; /* Show checkmark */
-        }
-        .color-swatch i { /* Checkmark icon */
-             display: none;
-             color: rgba(0,0,0,0.6); /* Darker check for better visibility on light colors */
-             font-size: 0.8rem;
+            color: #444;
         }
 
+        .legend-box {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            border-radius: 3px;
+        }
 
+        .canvas-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(180, 170, 160, 0.15);
+            width: 100%;
+            max-width: 1200px;
+            box-sizing: border-box;
+            overflow-x: auto;
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .room-title {
+            font-size: 32px;
+            font-weight: bold;
+            fill: rgba(140, 127, 117, 0.08);
+            text-anchor: middle;
+            dominant-baseline: middle;
+            letter-spacing: 8px;
+        }
+
+        .furn-label {
+            font-size: 14px;
+            font-weight: 600;
+            fill: #ffffff;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(100, 90, 80, 0.3);
+        }
+
+        .furn-label-dark {
+            font-size: 14px;
+            font-weight: 600;
+            fill: var(--text-color);
+            text-anchor: middle;
+            dominant-baseline: middle;
+            letter-spacing: 1px;
+        }
+
+        .dim-text {
+            font-size: 18px;
+            font-weight: bold;
+            fill: var(--dim-line);
+            text-anchor: middle;
+            dominant-baseline: middle;
+            letter-spacing: 1px;
+        }
+
+        .small-label {
+            font-size: 12px;
+            fill: var(--text-color);
+            text-anchor: middle;
+            dominant-baseline: middle;
+            font-weight: bold;
+        }
+        
+        .mep-label {
+            font-size: 11px;
+            font-weight: bold;
+            fill: #d35400;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800">
+<body>
 
-    <div id="customAlert" class="custom-alert">
-        <span id="customAlertMessage"></span>
+    <div class="header">
+        <h1>北歐奶茶風 旗艦綜合平面圖 (Master Plan)</h1>
+        <p>名人世界 15.86 坪物件最適解 ｜ 1:1 家具實體化 × 共用水牆工法 × 機電包管路徑</p>
     </div>
 
-    <div id="dayTooltip">
-        <div id="dayTooltipContent"></div>
+    <!-- 圖例說明 -->
+    <div class="legend-container">
+        <div class="legend-item"><div class="legend-box" style="background: url(#concrete-pattern); border: 1px solid var(--wall-color);"></div>15cm 廚衛共用水牆 (濕式輕隔間)</div>
+        <div class="legend-item"><div class="legend-box" style="background: var(--mep-beam); opacity: 0.3; border: 1px dashed #d35400;"></div>H=2.6m 天花板假樑 (藏冷氣/新風管線)</div>
+        <div class="legend-item"><div class="legend-box" style="background: none; border: 2px dashed var(--mep-ac);"></div>1對1 冷氣室內/外機</div>
+        <div class="legend-item"><div class="legend-box" style="background: none; border: 2px dashed var(--mep-fresh);"></div>正壓新風主機</div>
+        <div class="legend-item"><div class="legend-box" style="background: var(--furn-sofa);"></div>實體化家具 (KIVIK / NORDEN / Queen Bed)</div>
     </div>
 
-    <main class="container mx-auto p-4 md:p-6">
-        <section id="calendarViewSection" class="bg-white p-4 sm:p-6 shadow-lg rounded-xl" aria-labelledby="calendar-section-title">
-            <div class="calendar-header">
-                <div class="calendar-header-left">
-                    <div id="userAvatarButton" class="user-avatar" title="功能說明">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <h2 id="monthYearDisplayNav" class="text-xl font-semibold text-gray-800" aria-live="polite" title="選擇月份 (未來功能)"></h2>
-                </div>
-                <div class="calendar-header-right">
-                     <button id="searchButtonNav" type="button" title="搜尋行程">
-                        <i class="fas fa-search"></i>
-                    </button>
-                    <button id="todayButtonNav" type="button" title="回到今天">
-                        <i class="fas fa-calendar-day"></i>
-                    </button>
-                    <button id="openManagementModalButtonNav" type="button" title="設定">
-                        <i class="fas fa-cog"></i>
-                    </button>
-                </div>
-            </div>
+    <div class="canvas-container">
+        <!-- SVG 畫布 1px = 1cm -->
+        <svg viewBox="-80 -80 1350 600" xmlns="http://www.w3.org/2000/svg">
             
-            <div id="searchBarContainer" class="mb-4 flex gap-2 hidden"> 
-                <input type="search" id="searchInput" placeholder="搜尋行程描述、標籤、地點..." class="form-input w-full">
-                <button id="searchButton" type="button" class="form-button primary">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
+            <defs>
+                <!-- 箭頭標記 -->
+                <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto">
+                    <path d="M9,0 L0,3 L9,6 z" fill="var(--dim-line)" />
+                </marker>
+                <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <path d="M0,0 L9,3 L0,6 z" fill="var(--dim-line)" />
+                </marker>
 
-            <div id="monthControls" class="flex justify-between items-center mb-4">
-                <button type="button" onclick="Calendar.changeMonth(-1)" class="bg-slate-200 hover:bg-slate-300 text-slate-700 py-2 px-3 rounded-md transition-colors text-sm" aria-label="上個月">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <h2 id="monthYearDisplay" class="text-lg font-semibold text-sky-700" aria-live="polite"></h2> 
-                <button type="button" onclick="Calendar.changeMonth(1)" class="bg-slate-200 hover:bg-slate-300 text-slate-700 py-2 px-3 rounded-md transition-colors text-sm" aria-label="下個月">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
+                <!-- 紋理材質 -->
+                <pattern id="wood-floor" width="40" height="120" patternUnits="userSpaceOnUse">
+                    <rect width="40" height="120" fill="var(--floor-wood)"/>
+                    <line x1="0" y1="0" x2="0" y2="120" stroke="#ede5db" stroke-width="1"/>
+                    <line x1="0" y1="60" x2="40" y2="60" stroke="#ede5db" stroke-width="1"/>
+                </pattern>
+                
+                <pattern id="tile-floor" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <rect width="40" height="40" fill="var(--floor-tile)"/>
+                    <rect width="40" height="40" fill="none" stroke="#e0d7cd" stroke-width="1"/>
+                </pattern>
+
+                <pattern id="balcony-hatch" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <rect width="20" height="20" fill="var(--balcony-floor)"/>
+                    <line x1="0" y1="0" x2="0" y2="20" stroke="#d4cdc2" stroke-width="1"/>
+                </pattern>
+
+                <pattern id="concrete-pattern" width="10" height="10" patternUnits="userSpaceOnUse">
+                    <rect width="10" height="10" fill="var(--wet-wall)" />
+                    <circle cx="3" cy="3" r="1" fill="#a09388" />
+                    <circle cx="7" cy="7" r="1.5" fill="#5c5046" />
+                </pattern>
+            </defs>
+
+            <!-- ================= 背景與區域劃分 ================= -->
+            <!-- 陽台區 (0.94m 寬) -->
+            <polygon points="0,40 40,0 94,0 94,400 40,400 0,360" fill="url(#balcony-hatch)" />
             
-            <div id="calendarGridHeader" class="calendar-grid-header">
-            </div>
-            <div id="calendarGrid" class="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200 rounded-md overflow-hidden" aria-labelledby="monthYearDisplay">
-            </div>
+            <!-- 主臥室 (3m 寬) -->
+            <rect x="94" y="0" width="300" height="400" fill="url(#wood-floor)" />
+            
+            <!-- 客餐廳 (4.86m 寬) -->
+            <rect x="394" y="0" width="486" height="400" fill="url(#wood-floor)" />
+            
+            <!-- 衛浴 (2.3m寬 x 1.5m深) -->
+            <rect x="880" y="0" width="230" height="150" fill="url(#tile-floor)" />
 
-            <div id="itineraryControls" class="mt-6">
-                <form onsubmit="event.preventDefault();"> <div>
-                         <label for="scheduleNotes" class="form-label">行程表備註 (本月):</label>
-                         <textarea id="scheduleNotes" rows="3" class="form-input" placeholder="例如：5月重要會議、團隊活動"></textarea>
-                         <button id="saveNotesButton" type="button" class="mt-2 form-button success">儲存備註</button> </div>
-                </form>
-                <div class="mt-6 text-right">
-                    <button id="exportItineraryButton" type="button" onclick="Exporter.exportItineraryToICS()" class="form-button success">
-                        <i class="fas fa-file-export mr-2"></i>匯出行程表 (.ics)
-                    </button>
-                </div>
-            </div>
-        </section>
+            <!-- 廚房與玄關 (2.3m寬 x 2.35m深，扣除15cm共用水牆) -->
+            <rect x="880" y="165" width="230" height="235" fill="url(#tile-floor)" />
 
-        <section id="dayViewContainer" class="hidden" aria-labelledby="dayViewDateTitle">
-            <h2 id="dayViewDateTitle" class="text-2xl font-bold text-sky-800 mb-4"></h2>
-            <div id="dayViewEventsList" class="space-y-3 mb-6">
-            </div>
-            <div class="day-view-controls">
-                <div class="control-group-left">
-                    <button id="addNewItemInDayViewButton" type="button" class="form-button success">
-                        <i class="fas fa-plus mr-2"></i>新增本日行程
-                    </button>
-                    <button id="resetDayButton" type="button" class="form-button danger">
-                        <i class="fas fa-trash-restore mr-2"></i>重置本日資料
-                    </button>
-                </div>
-                <button id="backToCalendarViewButton" type="button" class="form-button secondary">
-                    <i class="fas fa-calendar-alt mr-2"></i>返回月曆檢視
-                </button>
-            </div>
-        </section>
-    </main>
+            <!-- 空間浮水印 -->
+            <text x="244" y="200" class="room-title">主臥室</text>
+            <text x="637" y="200" class="room-title">客餐廳</text>
 
-    <div id="managementModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="managementModalTitle">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="managementModalTitle" class="modal-title">設定</h3>
-                <button id="closeManagementModalButton" class="close-button" aria-label="關閉">&times;</button>
-            </div>
-            <div id="itineraryManagementContent" class="space-y-6">
-                <div>
-                    <h4 class="text-lg font-medium text-slate-800 mb-2">行程表設定</h4>
-                    <form onsubmit="event.preventDefault(); ScheduleParser.triggerImportScheduleFromPastedText();" class="space-y-3">
-                        <div>
-                            <label for="fullSchedulePasteArea" class="form-label">貼上行程表文字 (簡易格式)</label>
-                            <textarea id="fullSchedulePasteArea" rows="5" class="form-input" placeholder="每行一個行程項目，或包含日期 (如 5/15 會議)。支援 Markdown。"></textarea>
-                        </div>
-                        <button type="submit" class="w-full form-button warning">匯入貼上之文字</button>
-                    </form>
-                </div>
-                <hr class="border-slate-200">
-                <div class="space-y-3">
-                   <label for="holidayFileImport" class="form-label">匯入假期檔案 (.ics)</label>
-                   <input type="file" id="holidayFileImport" accept=".ics" class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-sky-100 file:text-sky-700 hover:file:bg-sky-200">
-                   <button type="button" onclick="HolidayImporter.triggerHolidayImport()" class="w-full form-button primary">匯入假期</button>
-               </div>
-                <hr class="border-slate-200">
-                <section aria-labelledby="itinerary-actions-title-modal" class="space-y-3">
-                    <h4 id="itinerary-actions-title-modal" class="text-md font-medium text-slate-700">行程表儲存與清除</h4>
-                    <div class="space-y-2">
-                        <button id="saveItineraryButton" type="button" class="w-full form-button primary">儲存目前行程表</button>
-                        <button id="clearItineraryButton" type="button" class="w-full form-button danger">清除本月行程表</button>
-                    </div>
-                </section>
-                <p class="text-xs text-slate-500 mt-2 text-center">注意：行程表資料將儲存在您的瀏覽器中。</p>
-            </div>
-        </div>
+
+            <!-- ================= 隱藏式機電天花板 (MEP Overlay) ================= -->
+            <!-- H=2.6m 木作假樑 (藏全室管線) -->
+            <g opacity="0.3">
+                <rect x="94" y="0" width="784" height="40" fill="var(--mep-beam)" stroke="#d35400" stroke-width="2" stroke-dasharray="5,5" />
+                <rect x="354" y="40" width="40" height="110" fill="var(--mep-beam)" stroke="#d35400" stroke-width="2" stroke-dasharray="5,5" />
+            </g>
+            <text x="244" y="20" class="mep-label">H=2.6m 木作假樑 (藏冷熱水/冷媒/新風管)</text>
+            <text x="374" y="95" class="mep-label" transform="rotate(90, 374, 95)">假樑延伸</text>
+
+
+            <!-- ================= 建築牆體結構 ================= -->
+            
+            <g fill="var(--wall-color)">
+                <!-- 左側陽台分隔牆 -->
+                <rect x="90" y="0" width="4" height="400" />
+                <!-- 主臥與客廳虛線分隔 -->
+                <line x1="394" y1="0" x2="394" y2="400" stroke="var(--wall-color)" stroke-width="3" stroke-dasharray="10,10" />
+                <!-- 客廳與衛廚分隔牆 (左牆) -->
+                <rect x="878" y="0" width="4" height="80" /> <!-- 預留衛浴門洞 80~150 -->
+                <rect x="878" y="150" width="4" height="250" />
+                <!-- 建築外圍主牆 -->
+                <rect x="94" y="-4" width="1020" height="4" />
+                <rect x="94" y="400" width="926" height="4" /> <!-- 預留大門 1020~1110 -->
+                <rect x="1110" y="0" width="4" height="310" /> <!-- 預留大門開門空間 -->
+            </g>
+
+            <!-- 🌟 重點：15cm 廚衛共用水牆 (Wet Wall) -->
+            <!-- 位於 y=150 到 y=165，長度 x=882 到 x=1110 -->
+            <rect x="882" y="150" width="228" height="15" fill="url(#concrete-pattern)" stroke="var(--wall-color)" stroke-width="1.5" />
+            <text x="996" y="158" class="furn-label" style="font-size: 10px; fill: #fff; letter-spacing: 2px;">15cm 共用水牆 (內藏排水與給水管)</text>
+
+
+            <!-- ================= 家具與重點設備 (1:1 實體化) ================= -->
+            
+            <!-- 【陽台區】 -->
+            <!-- 洗衣機 -->
+            <rect x="15" y="280" width="65" height="70" fill="#f0ebe6" stroke="#c4bdb6" stroke-width="2" rx="4" />
+            <circle cx="47.5" cy="315" r="20" fill="#d4cec8" />
+            <text x="47.5" y="365" class="small-label" style="font-size:11px;">洗衣機</text>
+            
+            <!-- 新風機主機 (天花板吊掛示意) -->
+            <rect x="15" y="20" width="60" height="40" fill="none" stroke="var(--mep-fresh)" stroke-width="2" stroke-dasharray="4,2" rx="3" />
+            <text x="45" y="40" class="mep-label" style="fill: var(--mep-fresh);" transform="rotate(90, 45, 40)">新風機</text>
+            
+            <!-- 冷氣室外機 (上下疊放示意) -->
+            <rect x="15" y="190" width="60" height="70" fill="none" stroke="var(--mep-ac)" stroke-width="2" stroke-dasharray="4,2" rx="3" />
+            <text x="45" y="225" class="mep-label" style="fill: var(--mep-ac);" transform="rotate(90, 45, 225)">疊放室外機</text>
+
+
+            <!-- 【主臥室】 -->
+            <!-- 1對1冷氣室內機 -->
+            <rect x="180" y="0" width="90" height="20" fill="none" stroke="var(--mep-ac)" stroke-width="2" rx="2" />
+            <text x="225" y="10" class="mep-label" style="fill: var(--mep-ac);">主臥冷氣</text>
+
+            <!-- 化妝台 -->
+            <rect x="94" y="0" width="60" height="45" fill="var(--furn-wood)" />
+            <circle cx="124" cy="65" r="15" fill="var(--furn-wood-dark)" />
+            <text x="124" y="22" class="small-label" fill="#fff">化妝台</text>
+
+            <!-- Queen Size 床組 (160x200cm) + 上櫃 (160x45cm) -->
+            <rect x="154" y="0" width="160" height="45" fill="var(--furn-wood-dark)" />
+            <line x1="154" y1="0" x2="314" y2="45" stroke="#bda38b" stroke-width="1" />
+            <line x1="314" y1="0" x2="154" y2="45" stroke="#bda38b" stroke-width="1" />
+            <text x="234" y="22" class="furn-label">床頭上櫃</text>
+
+            <rect x="154" y="45" width="160" height="200" fill="#ede2d5" rx="4" />
+            <rect x="154" y="80" width="160" height="165" fill="var(--furn-bed)" rx="4" />
+            <path d="M 154 90 Q 234 110 314 90" fill="none" stroke="#e3d6c8" stroke-width="2" />
+            <rect x="170" y="55" width="55" height="32" fill="#ffffff" rx="5" />
+            <rect x="245" y="55" width="55" height="32" fill="#ffffff" rx="5" />
+            <text x="234" y="150" class="furn-label-dark" style="opacity: 0.4;">Queen Size 雙人床</text>
+
+            <!-- 系統衣櫃 -->
+            <rect x="94" y="330" width="290" height="70" fill="var(--furn-wardrobe)" />
+            <rect x="100" y="335" width="135" height="60" fill="none" stroke="#f4ede6" stroke-width="2" />
+            <rect x="240" y="335" width="135" height="60" fill="none" stroke="#f4ede6" stroke-width="2" />
+            <text x="239" y="365" class="furn-label">系統衣櫃</text>
+
+
+            <!-- 【客餐廳】 -->
+            <!-- 大噸數冷氣室內機 (隔間牆上) -->
+            <rect x="364" y="50" width="20" height="100" fill="none" stroke="var(--mep-ac)" stroke-width="2" rx="2" />
+            <text x="374" y="100" class="mep-label" style="fill: var(--mep-ac);" transform="rotate(90, 374, 100)">客廳冷氣</text>
+
+            <!-- 沙發背櫃 -->
+            <rect x="405" y="0" width="225" height="30" fill="var(--furn-wood-dark)" />
+            <text x="517" y="15" class="furn-label">沙發背櫃</text>
+
+            <!-- IKEA KIVIK 沙發床 (225x90cm) -->
+            <rect x="405" y="30" width="225" height="144" fill="none" stroke="var(--furn-sofa)" stroke-width="2" stroke-dasharray="8,5" opacity="0.8" />
+            <rect x="405" y="30" width="225" height="90" fill="var(--furn-sofa)" rx="5" />
+            <rect x="405" y="30" width="225" height="15" fill="#b8b0a6" rx="5" />
+            <rect x="405" y="45" width="20" height="75" fill="#c2b9af" rx="3" />
+            <rect x="610" y="45" width="20" height="75" fill="#c2b9af" rx="3" />
+            <line x1="473" y1="45" x2="473" y2="120" stroke="#b8b0a6" stroke-width="2" />
+            <line x1="541" y1="45" x2="541" y2="120" stroke="#b8b0a6" stroke-width="2" />
+            <text x="517" y="155" class="furn-label-dark" style="opacity: 0.5;">KIVIK 展開範圍</text>
+
+            <!-- 極簡茶几 -->
+            <circle cx="517" cy="205" r="28" fill="#fcfaf7" stroke="#e0d5c8" stroke-width="2" />
+
+            <!-- IKEA NORDEN 半折疊桌 (89x80cm) -->
+            <g transform="translate(670, 20)">
+                <rect x="0" y="0" width="63" height="80" fill="var(--furn-wood-light)" />
+                <line x1="63" y1="0" x2="63" y2="80" stroke="#d4c6b5" stroke-width="1.5" />
+                <rect x="63" y="0" width="26" height="80" fill="var(--furn-wood)" />
+                <line x1="89" y1="0" x2="89" y2="80" stroke="#bda38b" stroke-width="2" />
+                <text x="44" y="40" class="furn-label-dark" style="font-size: 11px;">NORDEN桌</text>
+            </g>
+            <!-- 餐椅 -->
+            <rect x="630" y="42" width="30" height="35" fill="var(--furn-sofa)" rx="5" />
+            <rect x="770" y="42" width="30" height="35" fill="var(--furn-sofa)" rx="5" />
+
+            <!-- 下方收納列 -->
+            <rect x="400" y="360" width="45" height="40" fill="var(--furn-wood)" />
+            <text x="422" y="380" class="furn-label" style="font-size:12px;">書櫃</text>
+
+            <rect x="445" y="360" width="180" height="40" fill="var(--furn-wood)" />
+            <line x1="505" y1="360" x2="505" y2="400" stroke="#bda38b" stroke-width="1" />
+            <line x1="565" y1="360" x2="565" y2="400" stroke="#bda38b" stroke-width="1" />
+            <text x="535" y="340" class="furn-label-dark">電視櫃 (對齊沙發)</text>
+
+            <rect x="820" y="340" width="60" height="60" fill="#edeae5" stroke="#c4bdb6" />
+            <text x="850" y="370" class="small-label">冰箱 REF</text>
+
+
+            <!-- 【衛浴空間 (上方 2.3m x 1.5m)】 -->
+            <!-- 100cm 半高矮牆隔斷 -->
+            <rect x="1030" y="0" width="80" height="150" fill="#f0f3f5" />
+            <rect x="1024" y="0" width="12" height="100" fill="#f0ebe4" stroke="#c4bdb6" stroke-width="2" rx="2" />
+            <text x="1030" y="50" class="tiny-label" fill="#8c7f75" transform="rotate(90, 1030, 50)" style="letter-spacing: 2px;">半高矮牆</text>
+            <circle cx="1070" cy="75" r="12" stroke="#bbb" fill="none" />
+            <circle cx="1070" cy="75" r="2" fill="#bbb" />
+
+            <!-- 馬桶與洗手台 (靠左牆) -->
+            <rect x="890" y="0" width="30" height="15" fill="var(--furn-bath)" stroke="#dcd6d0" rx="3" />
+            <ellipse cx="905" cy="30" rx="15" ry="22" fill="var(--furn-bath)" stroke="#dcd6d0" />
+            <text x="905" y="65" class="small-label">馬桶</text>
+
+            <rect x="940" y="0" width="70" height="50" fill="#fcfaf7" stroke="#e0d7cd"/>
+            <ellipse cx="975" cy="25" rx="20" ry="12" fill="var(--furn-bath)" stroke="#dcd6d0" />
+            <circle cx="975" cy="10" r="3" fill="#a89d93" />
+            <text x="975" y="65" class="small-label">洗手台</text>
+
+
+            <!-- 【廚房與玄關 (下方 2.3m x 2.35m)】 -->
+            <!-- 廚房流理台 (緊貼 15cm 共用水牆) -->
+            <rect x="940" y="165" width="170" height="60" fill="var(--furn-kitchen)" />
+            <!-- 水槽 -->
+            <rect x="950" y="170" width="70" height="50" fill="#f5f2ed" rx="3" />
+            <rect x="955" y="175" width="30" height="40" fill="#e8e5e0" rx="2" />
+            <rect x="985" y="175" width="30" height="40" fill="#dfdbd5" rx="2" />
+            <text x="985" y="240" class="small-label">雙口水槽</text>
+            <!-- 瓦斯爐/IH爐 -->
+            <rect x="1040" y="170" width="60" height="50" fill="#fcfaf7" rx="2" />
+            <circle cx="1055" cy="195" r="10" fill="none" stroke="#a89d93" stroke-width="2" />
+            <circle cx="1085" cy="195" r="10" fill="none" stroke="#a89d93" stroke-width="2" />
+            <text x="1070" y="240" class="small-label">IH爐</text>
+
+            <!-- 玄關收納 -->
+            <rect x="880" y="360" width="70" height="40" fill="var(--furn-wood-dark)" />
+            <text x="915" y="380" class="furn-label" style="font-size:12px;">家電櫃</text>
+            <rect x="950" y="360" width="70" height="40" fill="var(--furn-wood)" />
+            <text x="985" y="372" class="tiny-label">鞋櫃(下)</text>
+            <text x="985" y="388" class="tiny-label">掛衣桿(上)</text>
+
+
+            <!-- ================= 門片與開門軌跡 ================= -->
+            <g fill="none" stroke="#bea99a" stroke-width="2">
+                <!-- 衛浴門 (開在左牆靠下，往內推平貼南牆) -->
+                <path d="M 880 80 A 70 70 0 0 1 950 150" stroke-dasharray="5,5" />
+                <line x1="880" y1="150" x2="950" y2="150" stroke-width="4" stroke-linecap="round" />
+
+                <!-- 大門入口 (鉸鏈在 1110, y=400，向內往上推) -->
+                <path d="M 1020 400 A 90 90 0 0 1 1110 310" stroke-dasharray="5,5" />
+                <line x1="1110" y1="400" x2="1110" y2="310" stroke-width="4" stroke-linecap="round" />
+                <text x="1065" y="370" class="small-label" style="opacity: 0.5;">大門動線</text>
+            </g>
+
+
+            <!-- ================= 外部精準尺寸標註 ================= -->
+            <g stroke="var(--dim-line)" stroke-width="2">
+                <!-- 頂部尺寸線 -->
+                <line x1="94" y1="-30" x2="394" y2="-30" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+                <text x="244" y="-45" class="dim-text" stroke="none">3m (主臥)</text>
+                
+                <line x1="394" y1="-30" x2="880" y2="-30" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+                <text x="637" y="-45" class="dim-text" stroke="none">4.86m (客廳)</text>
+                
+                <line x1="880" y1="-30" x2="1110" y2="-30" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+                <text x="995" y="-45" class="dim-text" stroke="none">2.3m (衛廚)</text>
+
+                <!-- 頂部輔助短線 -->
+                <line x1="94" y1="-40" x2="94" y2="-20" stroke-width="1"/>
+                <line x1="394" y1="-40" x2="394" y2="-20" stroke-width="1"/>
+                <line x1="880" y1="-40" x2="880" y2="-20" stroke-width="1"/>
+                <line x1="1110" y1="-40" x2="1110" y2="-20" stroke-width="1"/>
+
+                <!-- 右側尺寸線 (精確扣除牆厚) -->
+                <line x1="1140" y1="0" x2="1140" y2="150" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+                <text x="1185" y="75" class="dim-text" stroke="none">1.5m</text>
+
+                <line x1="1140" y1="150" x2="1140" y2="165" />
+                <text x="1185" y="157.5" class="small-label" stroke="none">15cm 牆</text>
+
+                <line x1="1140" y1="165" x2="1140" y2="400" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+                <text x="1185" y="282.5" class="dim-text" stroke="none">2.35m</text>
+
+                <!-- 右側輔助短線 -->
+                <line x1="1130" y1="0" x2="1150" y2="0" stroke-width="1"/>
+                <line x1="1130" y1="150" x2="1150" y2="150" stroke-width="1"/>
+                <line x1="1130" y1="165" x2="1150" y2="165" stroke-width="1"/>
+                <line x1="1130" y1="400" x2="1150" y2="400" stroke-width="1"/>
+
+                <!-- 底部尺寸線 -->
+                <line x1="0" y1="440" x2="94" y2="440" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+                <text x="47" y="465" class="dim-text" stroke="none">0.94m</text>
+
+                <line x1="94" y1="440" x2="1110" y2="440" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+                <text x="602" y="465" class="dim-text" stroke="none">室內總長 10.16m</text>
+
+                <!-- 底部輔助短線 -->
+                <line x1="0" y1="430" x2="0" y2="450" stroke-width="1"/>
+                <line x1="94" y1="430" x2="94" y2="450" stroke-width="1"/>
+                <line x1="1110" y1="430" x2="1110" y2="450" stroke-width="1"/>
+            </g>
+
+        </svg>
     </div>
 
-    <div id="itineraryItemModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="itineraryItemModalTitle">
-        <div class="modal-content">
-            <div class="modal-header">
-                 <button id="closeItineraryItemModalButton" class="close-button" aria-label="關閉">&times;</button>
-                 <h3 id="itineraryItemModalTitle" class="modal-title text-center flex-grow">編輯行程項目</h3> 
-                 <button class="text-slate-500 hover:text-slate-700 invisible"> 
-                    <i class="fas fa-ellipsis-v"></i>
-                 </button>
-            </div>
-
-            <div id="itineraryItemsList" data-date="" class="space-y-2 mb-4 max-h-48 overflow-y-auto border-b border-slate-200 pb-2">
-            </div>
-
-            <div class="space-y-4">
-                <div>
-                    <label for="newItineraryItemText" class="form-label">行程描述 (支援 Markdown):</label>
-                    <textarea id="newItineraryItemText" rows="3" class="form-input" placeholder="輸入行程描述..."></textarea>
-                </div>
-                
-                <div>
-                    <label class="form-label">顏色標籤:</label>
-                    <div id="itineraryItemColorPicker" class="flex flex-wrap gap-2 mt-1 mb-3">
-                        <!-- Color swatches will be populated here by JS -->
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between">
-                     <label for="timeSettingToggle" class="form-label mb-0">時間設定</label>
-                     <button type="button" id="timeSettingToggle" class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 bg-gray-200" role="switch" aria-checked="false">
-                        <span class="sr-only">啟用時間設定</span>
-                        <span id="timeSettingToggleKnob" class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 ease-in-out translate-x-1"></span>
-                    </button>
-                </div>
-
-                <div id="timeInputsContainer" class="time-input-group hidden">
-                    <div>
-                        <label for="itineraryStartTime" class="form-label">開始時間:</label>
-                        <input type="time" id="itineraryStartTime" class="form-input">
-                    </div>
-                    <div>
-                        <label for="itineraryEndTime" class="form-label">結束時間:</label>
-                        <input type="time" id="itineraryEndTime" class="form-input">
-                    </div>
-                </div>
-                <div>
-                    <label for="itineraryItemTags" class="form-label">標籤 (以逗號分隔):</label>
-                    <input type="text" id="itineraryItemTags" class="form-input" placeholder="例如：工作,重要,會議">
-                </div>
-                <div>
-                    <label for="itineraryItemLocation" class="form-label">地點:</label>
-                    <input type="text" id="itineraryItemLocation" class="form-input" placeholder="例如：會議室 A, 公司">
-                </div>
-                <button id="addOrUpdateItineraryItemButton" type="button" class="w-full form-button primary mt-2">
-                     <i class="fas fa-plus mr-2"></i>新增項目
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="searchResultsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="searchResultsModalTitle">
-         <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="searchResultsModalTitle" class="modal-title">搜尋結果</h3>
-                <button id="closeSearchResultsModalButton" class="close-button" aria-label="關閉">&times;</button>
-            </div>
-            <div id="searchResultsList" class="max-h-[60vh] overflow-y-auto mt-4">
-            </div>
-        </div>
-    </div>
-
-    <div id="featureGuideModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="featureGuideModalTitle">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="featureGuideModalTitle" class="modal-title">功能推薦說明</h3>
-                <button id="closeFeatureGuideModalButton" class="close-button" aria-label="關閉">&times;</button>
-            </div>
-            <div id="featureGuideModalContent" class="mt-4 space-y-3 text-sm text-slate-700">
-                <p>歡迎使用個人行程表！以下是一些主要功能介紹：</p>
-                <ul>
-                    <li><strong>月曆檢視:</strong> 清晰呈現當月每日的行程概要。點擊日期可進入「日檢視」。週末及假日會以紅色標示。</li>
-                    <li><strong>日檢視:</strong> 詳細列出選定日期的所有行程，可新增、編輯、刪除單日行程，或重置當日所有資料。</li>
-                    <li><strong>行程管理:</strong>
-                        <ul>
-                            <li>點擊日期進入「日檢視」後，可點擊「<i class="fas fa-plus"></i> 新增本日行程」來建立新項目。</li>
-                            <li>行程項目支援 Markdown 格式描述、開始/結束時間、標籤、地點及<span class="font-semibold text-sky-600">顏色標籤</span>。</li>
-                            <li>在「編輯行程項目」彈窗中，您可以拖曳調整同一天內行程的順序。</li>
-                        </ul>
-                    </li>
-                    <li><strong>導覽列按鈕:</strong>
-                        <ul>
-                            <li><i class="fas fa-search"></i>: 搜尋行程內容、標籤或地點。</li>
-                            <li><i class="fas fa-calendar-day"></i>: 快速跳回包含「今天」的月份。</li>
-                            <li><i class="fas fa-cog"></i>: 開啟設定面板。</li>
-                        </ul>
-                    </li>
-                     <li><strong>設定面板 (<i class="fas fa-cog"></i>):</strong>
-                        <ul>
-                            <li><strong>貼上匯入:</strong> 可快速貼上純文字格式的行程進行匯入。</li>
-                            <li><strong>假期匯入:</strong> 支援匯入 .ics 格式的假期檔案。</li>
-                            <li><strong>儲存/清除:</strong> 手動儲存當前所有行程與備註，或清除「當月」所有行程與備註。</li>
-                        </ul>
-                    </li>
-                    <li><strong>行程表備註:</strong> 可為每個月記錄特別的備註事項。</li>
-                    <li><strong>匯出功能:</strong> 可將當月行程匯出為 .ics 檔案，方便匯入其他日曆應用。</li>
-                    <li><strong>資料儲存:</strong> 所有行程資料皆儲存在您的瀏覽器本機儲存空間，確保隱私。</li>
-                </ul>
-                <p class="mt-4 text-xs text-center">持續探索，讓行程管理更有效率！</p>
-            </div>
-        </div>
-    </div>
-
-
-    <script>
-    // --- Color Palette ---
-    // Storing Tailwind classes for easier application and a display name
-    const COLOR_CLASSES = {
-        default: { bg: 'bg-slate-200', text: 'text-slate-700', border: 'border-slate-400', name: '預設灰', hex: '#e2e8f0' },
-        red:     { bg: 'bg-red-200',   text: 'text-red-800',   border: 'border-red-500',   name: '熱情紅', hex: '#fecaca' },
-        orange:  { bg: 'bg-orange-200',text: 'text-orange-800',border: 'border-orange-500',name: '活力橙', hex: '#fed7aa' },
-        yellow:  { bg: 'bg-yellow-100',text: 'text-yellow-800',border: 'border-yellow-400',name: '明亮黃', hex: '#fef9c3' }, // Adjusted yellow for better visibility
-        green:   { bg: 'bg-green-200', text: 'text-green-800', border: 'border-green-500', name: '清新綠', hex: '#bbf7d0' },
-        teal:    { bg: 'bg-teal-100',  text: 'text-teal-800',  border: 'border-teal-400',  name: '湖水青', hex: '#ccfbf1' }, // Adjusted teal
-        blue:    { bg: 'bg-blue-200',  text: 'text-blue-800',  border: 'border-blue-500',  name: '天空藍', hex: '#bfdbfe' },
-        indigo:  { bg: 'bg-indigo-200',text: 'text-indigo-800',border: 'border-indigo-500',name: '沉穩靛', hex: '#c7d2fe' },
-        purple:  { bg: 'bg-purple-200',text: 'text-purple-800',border: 'border-purple-500',name: '夢幻紫', hex: '#e9d5ff' },
-        pink:    { bg: 'bg-pink-200',  text: 'text-pink-800',  border: 'border-pink-500',  name: '溫柔粉', hex: '#fbcfe8' }
-    };
-    const DEFAULT_COLOR_KEY = 'default';
-
-
-    // AppState
-    let AppState = {
-        currentYear: new Date().getFullYear(), currentMonth: new Date().getMonth(),
-        shifts: {}, notes: '', selectedDateForAssignment: null, holidays: {},
-        editingItemId: null, draggedItemId: null, tooltipTimeout: null,
-        currentView: 'calendar', 
-        selectedDayForDayView: null,
-        isTimeSettingEnabled: false,
-        selectedItemColorKey: DEFAULT_COLOR_KEY // For color picker in modal
-    };
-
-    // UIElements
-    const UIElements = {
-        mainTitle: null, monthYearDisplay: null, calendarGrid: null, calendarGridHeader: null,
-        monthYearDisplayNav: null, searchButtonNav: null, openManagementModalButtonNav: null, todayButtonNav: null,
-        userAvatarButton: null, 
-        fullSchedulePasteArea: null, 
-        itineraryItemModal: null, itineraryItemsList: null, newItineraryItemText: null, 
-        itineraryItemColorPicker: null, // Added for color picker
-        itineraryStartTime: null, itineraryEndTime: null, itineraryItemTags: null, itineraryItemLocation: null,
-        addOrUpdateItineraryItemButton: null, closeItineraryItemModalButton: null,
-        timeSettingToggle: null, timeSettingToggleKnob: null, timeInputsContainer: null,
-        scheduleNotesTextarea: null, customAlertBox: null, customAlertMessageBox: null, saveNotesButton: null,
-        itineraryControls: null, exportItineraryButton: null,
-        saveItineraryButton: null, clearItineraryButton: null,
-        managementModal: null, closeManagementModalButton: null,
-        itineraryManagementContent: null,
-        dayTooltip: null, dayTooltipContent: null,
-        searchInput: null, searchButton: null, searchBarContainer: null, monthControls: null,
-        searchResultsModal: null, searchResultsList: null, closeSearchResultsModalButton: null,
-        calendarViewSection: null, dayViewContainer: null, dayViewDateTitle: null, dayViewEventsList: null,
-        addNewItemInDayViewButton: null, backToCalendarViewButton: null, resetDayButton: null,
-        featureGuideModal: null, closeFeatureGuideModalButton: null, featureGuideModalContent: null
-    };
-
-    // Utils
-    const Utils = {
-        showCustomAlert: (message, type = 'error', duration = 3500) => {
-            if (!UIElements.customAlertBox || !UIElements.customAlertMessageBox) return;
-            UIElements.customAlertMessageBox.textContent = message;
-            UIElements.customAlertBox.className = 'custom-alert';
-            UIElements.customAlertBox.classList.add(type);
-            UIElements.customAlertBox.style.display = 'block';
-            if (duration > 0) {
-                setTimeout(() => { if(UIElements.customAlertBox) UIElements.customAlertBox.style.display = 'none'; }, duration);
-            }
-        },
-        hideCustomAlert: () => {
-            if (UIElements.customAlertBox) UIElements.customAlertBox.style.display = 'none';
-        },
-        getLocalStorageKey: (dataType, year = AppState.currentYear, month = AppState.currentMonth) => {
-            const version = "v3.34_color_tags"; // Updated version
-            if (dataType === 'holidays_all') {
-               return `personalItinerary_${version}_holidays_all`;
-            }
-            return `personalItinerary_${version}_${dataType}_${year}_${String(month + 1).padStart(2, '0')}`;
-        },
-        generateUUID: () => {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0, 
-                    v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        },
-        getTodayDateString: () => {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-    };
-
-    // DataStorage
-    const DataStorage = {
-        loadDataForCurrentMonth: () => {
-            try {
-                const shiftsData = localStorage.getItem(Utils.getLocalStorageKey('shifts'));
-                const parsedShifts = shiftsData ? JSON.parse(shiftsData) : {};
-                AppState.shifts = {}; 
-                for (const dateKey in parsedShifts) {
-                    if (Array.isArray(parsedShifts[dateKey])) {
-                        AppState.shifts[dateKey] = parsedShifts[dateKey].map(item => ({
-                            id: item.id || Utils.generateUUID(),
-                            description: item.description || "",
-                            startTime: item.startTime || "", 
-                            endTime: item.endTime || "",
-                            tags: Array.isArray(item.tags) ? item.tags : [],
-                            location: item.location || "",
-                            color: item.color || DEFAULT_COLOR_KEY // Load color, default if not present
-                        }));
-                    } else { 
-                        AppState.shifts[dateKey] = [{ 
-                            id: Utils.generateUUID(), 
-                            description: String(parsedShifts[dateKey]),
-                            startTime: "", endTime: "", tags: [], location: "", color: DEFAULT_COLOR_KEY
-                        }];
-                    }
-                }
-                const notesData = localStorage.getItem(Utils.getLocalStorageKey('notes'));
-                AppState.notes = notesData ? notesData : '';
-                if (UIElements.scheduleNotesTextarea) UIElements.scheduleNotesTextarea.value = AppState.notes;
-                const holidaysData = localStorage.getItem(Utils.getLocalStorageKey('holidays_all'));
-                AppState.holidays = holidaysData ? JSON.parse(holidaysData) : {};
-            } catch (e) { console.error("Error loading data:", e); Utils.showCustomAlert("讀取資料時發生錯誤。", "error"); }
-        },
-        saveDataForCurrentMonth: () => { 
-            try {
-                // Ensure all items have a color property before saving
-                for (const dateKey in AppState.shifts) {
-                    if (AppState.shifts[dateKey] && Array.isArray(AppState.shifts[dateKey])) {
-                        AppState.shifts[dateKey].forEach(item => {
-                            if (!item.color) {
-                                item.color = DEFAULT_COLOR_KEY;
-                            }
-                        });
-                    }
-                }
-                localStorage.setItem(Utils.getLocalStorageKey('shifts'), JSON.stringify(AppState.shifts));
-                localStorage.setItem(Utils.getLocalStorageKey('notes'), AppState.notes);
-                localStorage.setItem(Utils.getLocalStorageKey('holidays_all'), JSON.stringify(AppState.holidays));
-            } catch (e) { console.error("Error saving data:", e); Utils.showCustomAlert("儲存資料時發生錯誤。", "error"); }
-        },
-        clearCurrentMonthItinerary: () => { 
-            const currentMonthPrefix = `${AppState.currentYear}-${String(AppState.currentMonth + 1).padStart(2, '0')}`;
-            let itemsCleared = false;
-            for (const dateKey in AppState.shifts) {
-                if (dateKey.startsWith(currentMonthPrefix)) {
-                    if (AppState.shifts[dateKey] && AppState.shifts[dateKey].length > 0) itemsCleared = true;
-                    delete AppState.shifts[dateKey];
-                }
-            }
-            AppState.notes = "";
-            if (UIElements.scheduleNotesTextarea) UIElements.scheduleNotesTextarea.value = "";
-            DataStorage.saveDataForCurrentMonth();
-            Calendar.render(); 
-            if (AppState.currentView === 'day' && AppState.selectedDayForDayView && AppState.selectedDayForDayView.startsWith(currentMonthPrefix)) {
-                DayView.renderDayViewItems(AppState.selectedDayForDayView); 
-            }
-            Utils.showCustomAlert(itemsCleared || AppState.notes === "" ? `已清除 ${AppState.currentYear}年 ${AppState.currentMonth + 1}月 的行程表資料與備註。` : `${AppState.currentYear}年 ${AppState.currentMonth + 1}月 的行程表無資料可清除。`, itemsCleared || AppState.notes === "" ? "success" : "info");
-        }
-    };
-    
-    // HolidayImporter
-    const HolidayImporter = { 
-        parseICS: (icsContent) => {
-            const lines = icsContent.split(/\r\n|\n|\r/);
-            let inEvent = false;
-            let currentEvent = { DTSTART_val: null, DTEND_val: null, SUMMARY_val: null };
-            let newHolidays = {};
-            const parseDateFromICSLine = (line) => {
-                if (!line) return null;
-                const dateStrPart = line.substring(line.indexOf(':') + 1);
-                const actualDateStr = dateStrPart.includes('VALUE=DATE:') ? dateStrPart.substring('VALUE=DATE:'.length) : dateStrPart;
-                if (actualDateStr.length < 8) return null; 
-                const year = parseInt(actualDateStr.substring(0, 4));
-                const month = parseInt(actualDateStr.substring(4, 6)) - 1; 
-                const day = parseInt(actualDateStr.substring(6, 8));
-                if (isNaN(year) || isNaN(month) || isNaN(day) || month < 0 || month > 11 || day < 1 || day > 31) {
-                     console.warn("Invalid date parsed from ICS:", actualDateStr); return null;
-                }
-                return new Date(Date.UTC(year, month, day)); 
-            };
-            const formatDateToKey = (dateObj) => {
-                if (!dateObj) return null;
-                const year = dateObj.getUTCFullYear();
-                const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
-                const day = String(dateObj.getUTCDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            };
-            for (const line of lines) {
-                if (line.toUpperCase().startsWith('BEGIN:VEVENT')) {
-                    inEvent = true;
-                    currentEvent = { DTSTART_val: null, DTEND_val: null, SUMMARY_val: null };
-                } else if (line.toUpperCase().startsWith('END:VEVENT')) {
-                    if (inEvent && currentEvent.DTSTART_val && currentEvent.SUMMARY_val) {
-                        let startDate = currentEvent.DTSTART_val;
-                        let endDate = currentEvent.DTEND_val;
-                        if (!endDate || endDate.getTime() <= startDate.getTime()) {
-                            const formattedDate = formatDateToKey(startDate);
-                            if (formattedDate) newHolidays[formattedDate] = currentEvent.SUMMARY_val;
-                        } else {
-                            let currentDate = new Date(startDate.getTime());
-                            while (currentDate.getTime() < endDate.getTime()) { 
-                                const formattedDate = formatDateToKey(currentDate);
-                                if (formattedDate) newHolidays[formattedDate] = currentEvent.SUMMARY_val;
-                                currentDate.setUTCDate(currentDate.getUTCDate() + 1); 
-                            }
-                        }
-                    }
-                    inEvent = false;
-                } else if (inEvent) {
-                    if (line.toUpperCase().startsWith('DTSTART')) {
-                        currentEvent.DTSTART_val = parseDateFromICSLine(line);
-                    } else if (line.toUpperCase().startsWith('DTEND')) {
-                        currentEvent.DTEND_val = parseDateFromICSLine(line);
-                    } else if (line.toUpperCase().startsWith('SUMMARY')) {
-                        currentEvent.SUMMARY_val = line.substring(line.indexOf(':') + 1).trim();
-                    }
-                }
-            }
-            return newHolidays;
-        },
-        triggerHolidayImport: () => {
-            const fileInput = document.getElementById('holidayFileImport');
-            if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-                Utils.showCustomAlert("請先選擇一個 .ics 假期檔案。", "info");
-                return;
-            }
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const importedHolidays = HolidayImporter.parseICS(e.target.result);
-                    if (Object.keys(importedHolidays).length > 0) {
-                        AppState.holidays = { ...AppState.holidays, ...importedHolidays }; 
-                        DataStorage.saveDataForCurrentMonth(); 
-                        Calendar.render();
-                        if (AppState.currentView === 'day' && AppState.selectedDayForDayView) {
-                            DayView.renderDayViewItems(AppState.selectedDayForDayView);
-                        }
-                        Utils.showCustomAlert(`成功匯入 ${Object.keys(importedHolidays).length} 個假期。`, "success");
-                        fileInput.value = ""; 
-                    } else {
-                        Utils.showCustomAlert("未在檔案中找到有效的假期事件。", "info");
-                        fileInput.value = "";
-                    }
-                } catch (err) {
-                    console.error("Error parsing holiday file:", err);
-                    Utils.showCustomAlert("解析假期檔案時發生錯誤。", "error");
-                    fileInput.value = "";
-                }
-            };
-            reader.onerror = () => {
-                Utils.showCustomAlert("讀取假期檔案時發生錯誤。", "error");
-                fileInput.value = "";
-            };
-            reader.readAsText(file);
-        }
-    };
-
-    // Calendar
-    const Calendar = { 
-        render: () => {
-            if (!UIElements.monthYearDisplayNav || !UIElements.monthYearDisplay || !UIElements.calendarGrid || !UIElements.calendarGridHeader) return;
-            
-            UIElements.calendarGrid.innerHTML = ''; 
-            UIElements.calendarGridHeader.innerHTML = '';
-
-            const currentDisplayDate = new Date(AppState.currentYear, AppState.currentMonth, 1);
-            const monthName = currentDisplayDate.toLocaleString('zh-Hant-TW', { month: 'long' });
-            const year = AppState.currentYear;
-            
-            UIElements.monthYearDisplayNav.textContent = `${year}, ${monthName}`;
-            UIElements.monthYearDisplay.textContent = `${year}年 ${AppState.currentMonth + 1}月`;
-
-
-            const firstDayOfMonth = new Date(AppState.currentYear, AppState.currentMonth, 1);
-            const lastDayOfMonth = new Date(AppState.currentYear, AppState.currentMonth + 1, 0);
-            const daysInMonth = lastDayOfMonth.getDate();
-            const dayOfWeek = firstDayOfMonth.getDay(); 
-            
-            const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
-            dayNames.forEach(name => {
-                const dayHeaderCell = document.createElement('div');
-                dayHeaderCell.textContent = name;
-                if (name === '日' || name === '六') { 
-                    dayHeaderCell.classList.add('text-red-600');
-                }
-                UIElements.calendarGridHeader.appendChild(dayHeaderCell);
-            });
-
-            for (let i = 0; i < dayOfWeek; i++) { 
-                const blankCell = document.createElement('div');
-                blankCell.className = 'calendar-day blank-day-cell p-1.5';
-                UIElements.calendarGrid.appendChild(blankCell);
-            }
-            
-            const todayDateString = Utils.getTodayDateString();
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayCell = document.createElement('div');
-                const dateStr = `${AppState.currentYear}-${String(AppState.currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                
-                dayCell.className = 'calendar-day current-month-day-cell p-1.5';
-                if (dateStr === todayDateString) {
-                    dayCell.classList.add('today');
-                }
-                dayCell.dataset.date = dateStr;
-
-                const dayNumberContainer = document.createElement('div');
-                dayNumberContainer.className = 'flex justify-center mb-1';
-                const dayNumber = document.createElement('span');
-                dayNumber.className = 'day-number-display';
-                dayNumber.textContent = day;
-
-                const currentDate = new Date(AppState.currentYear, AppState.currentMonth, day);
-                const currentDayOfWeek = currentDate.getDay();
-                const isWeekend = currentDayOfWeek === 0 || currentDayOfWeek === 6;
-                const holidayName = AppState.holidays[dateStr];
-
-                if (isWeekend || holidayName) {
-                    if (!(dateStr === todayDateString && dayCell.classList.contains('today'))) { 
-                       dayNumber.classList.add('text-red-600', 'font-semibold');
-                    }
-                }
-
-                dayNumberContainer.appendChild(dayNumber);
-                dayCell.appendChild(dayNumberContainer);
-                
-                const contentWrapper = document.createElement('div');
-                contentWrapper.className = 'day-content-wrapper space-y-1';
-
-                const itineraryItemsForDay = AppState.shifts[dateStr] || [];
-                
-                if (itineraryItemsForDay.length > 0) {
-                    itineraryItemsForDay.slice(0, 2).forEach(item => {
-                        const itemDiv = document.createElement('div');
-                        itemDiv.className = 'itinerary-item-display';
-                        
-                        // Apply color
-                        const colorKey = item.color || DEFAULT_COLOR_KEY;
-                        const colorInfo = COLOR_CLASSES[colorKey] || COLOR_CLASSES[DEFAULT_COLOR_KEY];
-                        itemDiv.classList.add(colorInfo.bg); // Use Tailwind bg class
-                        itemDiv.classList.add(colorInfo.text); // Use Tailwind text class for contrast
-                        
-                        let displayText = item.startTime ? `${item.startTime} ` : "";
-                        try {
-                            displayText += (typeof marked !== 'undefined' && marked.parse) ? marked.parse(item.description || "").trim().replace(/<p>|<\/p>/g, "") : (item.description || "").trim();
-                        } catch (e) { displayText += item.description || ""; }
-                        itemDiv.innerHTML = displayText;
-                        itemDiv.title = item.description; 
-                        contentWrapper.appendChild(itemDiv);
-                    });
-
-                    if (itineraryItemsForDay.length > 2) {
-                        const itemCountSpan = document.createElement('span');
-                        itemCountSpan.className = 'itinerary-item-count text-xs';
-                        itemCountSpan.textContent = `+${itineraryItemsForDay.length - 2} 更多`;
-                        contentWrapper.appendChild(itemCountSpan);
-                    }
-                }
-                
-                if (holidayName) {
-                    const holidaySpan = document.createElement('div');
-                    holidaySpan.textContent = holidayName; 
-                    holidaySpan.className = 'holiday-info text-orange-600 font-medium text-xs mt-auto text-center truncate px-1';
-                    contentWrapper.appendChild(holidaySpan); 
-                }
-
-                dayCell.appendChild(contentWrapper);
-                
-                dayCell.addEventListener('click', (event) => {
-                    DayView.openDayView(dateStr);
-                });
-                dayCell.addEventListener('mouseenter', (event) => UI.showTooltip(event, dateStr));
-                dayCell.addEventListener('mouseleave', UI.hideTooltip);
-                UIElements.calendarGrid.appendChild(dayCell);
-            }
-
-            const totalCells = dayOfWeek + daysInMonth;
-            const remainingCells = (7 - (totalCells % 7)) % 7;
-            for (let i = 0; i < remainingCells; i++) { 
-                const blankCell = document.createElement('div');
-                blankCell.className = 'calendar-day blank-day-cell p-1.5';
-                UIElements.calendarGrid.appendChild(blankCell);
-            }
-        },
-        changeMonth: (offset) => { 
-            if (UIElements.scheduleNotesTextarea) {
-                AppState.notes = UIElements.scheduleNotesTextarea.value; 
-            }
-            DataStorage.saveDataForCurrentMonth(); 
-
-            AppState.currentMonth += offset;
-            if (AppState.currentMonth < 0) {
-                AppState.currentMonth = 11;
-                AppState.currentYear--;
-            } else if (AppState.currentMonth > 11) {
-                AppState.currentMonth = 0;
-                AppState.currentYear++;
-            }
-            DataStorage.loadDataForCurrentMonth(); 
-            Calendar.render();
-        },
-        goToToday: () => {
-            const today = new Date();
-            AppState.currentYear = today.getFullYear();
-            AppState.currentMonth = today.getMonth();
-            DataStorage.loadDataForCurrentMonth();
-            Calendar.render();
-            Utils.showCustomAlert("已跳至今日所在月份。", "info", 2000);
-        }
-    };
-
-    // ScheduleParser
-    const ScheduleParser = { 
-        parseTextToIntermediateData: (text, inputYear, inputMonth_1_indexed) => {
-            const lines = text.split('\n').map(line => line.trim());
-            let yearToUse = inputYear;
-            let monthToUse_0_indexed = inputMonth_1_indexed !== null ? inputMonth_1_indexed - 1 : null; 
-            let tempShifts = {};
-            let tempNotesFromParser = "";
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-                const yearMonthMatch = line.match(/(\d+)\s*年\s*(\d+)\s*月/);
-                if (yearMonthMatch) {
-                    let parsedYearFromText = parseInt(yearMonthMatch[1]);
-                    if (parsedYearFromText < 200 && parsedYearFromText > 90) parsedYearFromText += 1911; 
-                    yearToUse = parsedYearFromText;
-                    monthToUse_0_indexed = parseInt(yearMonthMatch[2]) - 1; 
-                    lines.splice(i, 1); i--; 
-                    break; 
-                }
-            }
-            if (yearToUse === null || yearToUse === undefined || isNaN(yearToUse)) yearToUse = AppState.currentYear;
-            if (monthToUse_0_indexed === null || monthToUse_0_indexed === undefined || isNaN(monthToUse_0_indexed)) monthToUse_0_indexed = AppState.currentMonth;
-            lines.forEach(line => {
-                if (line.trim() === "") return;
-                const dateMatch = line.match(/^(\d{1,2}(?:\/\d{1,2})?)\s+(.+)/);
-                if (dateMatch) {
-                    const datePart = dateMatch[1];
-                    const description = dateMatch[2].trim();
-                    let day, month;
-                    if (datePart.includes('/')) {
-                        [month, day] = datePart.split('/').map(Number);
-                        month -= 1; 
-                    } else {
-                        day = parseInt(datePart);
-                        month = monthToUse_0_indexed; 
-                    }
-                    if (!isNaN(day) && day >= 1 && day <= 31 && !isNaN(month) && month >=0 && month <=11) {
-                        const dateStr = `${yearToUse}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                        if (!tempShifts[dateStr]) tempShifts[dateStr] = [];
-                        tempShifts[dateStr].push({ 
-                            id: Utils.generateUUID(), description: description, 
-                            startTime: "", endTime: "", tags: [], location: "", color: DEFAULT_COLOR_KEY 
-                        });
-                    } else { 
-                        if (!tempNotesFromParser) tempNotesFromParser = line; else tempNotesFromParser += "\n" + line;
-                    }
-                } else { 
-                    if (!tempNotesFromParser) tempNotesFromParser = line; else tempNotesFromParser += "\n" + line;
-                }
-            });
-            const success = Object.keys(tempShifts).length > 0 || tempNotesFromParser.length > 0;
-            return { success, parsedYear: yearToUse, parsedMonth: monthToUse_0_indexed, parsedShifts: tempShifts, parsedNotes: tempNotesFromParser };
-        },
-        applyParsedDataToAppState: (year, month_0_indexed, shiftsToApply, notesToApply) => {
-            AppState.currentYear = year;
-            AppState.currentMonth = month_0_indexed;
-            const targetMonthPrefix = `${year}-${String(month_0_indexed + 1).padStart(2, '0')}`;
-            for (const dateKey in AppState.shifts) {
-                if (dateKey.startsWith(targetMonthPrefix)) {
-                    delete AppState.shifts[dateKey];
-                }
-            }
-            for(const dateKey in shiftsToApply) {
-                if (dateKey.startsWith(targetMonthPrefix)) { 
-                    if (!AppState.shifts[dateKey]) AppState.shifts[dateKey] = [];
-                    AppState.shifts[dateKey].push(...shiftsToApply[dateKey]);
-                }
-            }
-            if (notesToApply && notesToApply.trim() !== "") {
-                if (AppState.notes) AppState.notes += "\n" + notesToApply;
-                else AppState.notes = notesToApply;
-            }
-            if (UIElements.scheduleNotesTextarea) UIElements.scheduleNotesTextarea.value = AppState.notes;
-            DataStorage.saveDataForCurrentMonth(); 
-            Calendar.render(); 
-            Utils.showCustomAlert(`行程表已成功匯入/更新 ${year}年${month_0_indexed + 1}月 的資料！`, "success");
-        },
-        triggerImportScheduleFromPastedText: () => {
-            if (!UIElements.fullSchedulePasteArea) return;
-            const text = UIElements.fullSchedulePasteArea.value;
-            if (!text.trim()) {
-                Utils.showCustomAlert("請先在文字區域貼上行程表的內容。", "info");
-                return;
-            }
-            const intermediateData = ScheduleParser.parseTextToIntermediateData(text, AppState.currentYear, AppState.currentMonth + 1);
-            if (intermediateData.success) {
-                ScheduleParser.applyParsedDataToAppState(
-                    intermediateData.parsedYear, intermediateData.parsedMonth,
-                    intermediateData.parsedShifts, intermediateData.parsedNotes
-                );
-                 UIElements.fullSchedulePasteArea.value = ""; 
-            } else {
-                 Utils.showCustomAlert("未能在貼上的文字中找到任何有效的行程表資料。", "error");
-            }
-        }
-    };
-
-    // UI
-    const UI = {
-        cacheDOMElements: () => {
-            UIElements.mainTitle = document.getElementById('mainTitle'); 
-            UIElements.monthYearDisplay = document.getElementById('monthYearDisplay');
-            UIElements.calendarGrid = document.getElementById('calendarGrid');
-            UIElements.calendarGridHeader = document.getElementById('calendarGridHeader');
-            UIElements.monthYearDisplayNav = document.getElementById('monthYearDisplayNav');
-            UIElements.searchButtonNav = document.getElementById('searchButtonNav');
-            UIElements.openManagementModalButtonNav = document.getElementById('openManagementModalButtonNav');
-            UIElements.todayButtonNav = document.getElementById('todayButtonNav');
-            UIElements.userAvatarButton = document.getElementById('userAvatarButton');
-
-            UIElements.fullSchedulePasteArea = document.getElementById('fullSchedulePasteArea');
-            
-            UIElements.itineraryItemModal = document.getElementById('itineraryItemModal');
-            UIElements.itineraryItemsList = document.getElementById('itineraryItemsList');
-            UIElements.newItineraryItemText = document.getElementById('newItineraryItemText');
-            UIElements.itineraryItemColorPicker = document.getElementById('itineraryItemColorPicker');
-            UIElements.itineraryStartTime = document.getElementById('itineraryStartTime');
-            UIElements.itineraryEndTime = document.getElementById('itineraryEndTime');
-            UIElements.itineraryItemTags = document.getElementById('itineraryItemTags');
-            UIElements.itineraryItemLocation = document.getElementById('itineraryItemLocation');
-            UIElements.addOrUpdateItineraryItemButton = document.getElementById('addOrUpdateItineraryItemButton');
-            UIElements.closeItineraryItemModalButton = document.getElementById('closeItineraryItemModalButton');
-            UIElements.timeSettingToggle = document.getElementById('timeSettingToggle');
-            UIElements.timeSettingToggleKnob = document.getElementById('timeSettingToggleKnob');
-            UIElements.timeInputsContainer = document.getElementById('timeInputsContainer');
-            
-            UIElements.scheduleNotesTextarea = document.getElementById('scheduleNotes');
-            UIElements.customAlertBox = document.getElementById('customAlert');
-            UIElements.customAlertMessageBox = document.getElementById('customAlertMessage');
-            UIElements.saveNotesButton = document.getElementById('saveNotesButton');
-            
-            UIElements.itineraryControls = document.getElementById('itineraryControls');
-            UIElements.exportItineraryButton = document.getElementById('exportItineraryButton');
-            
-            UIElements.saveItineraryButton = document.getElementById('saveItineraryButton');
-            UIElements.clearItineraryButton = document.getElementById('clearItineraryButton');
-            
-            UIElements.managementModal = document.getElementById('managementModal');
-            UIElements.closeManagementModalButton = document.getElementById('closeManagementModalButton');
-            UIElements.itineraryManagementContent = document.getElementById('itineraryManagementContent');
-            
-            UIElements.dayTooltip = document.getElementById('dayTooltip');
-            UIElements.dayTooltipContent = document.getElementById('dayTooltipContent');
-
-            UIElements.searchInput = document.getElementById('searchInput'); 
-            UIElements.searchButton = document.getElementById('searchButton'); 
-            UIElements.searchBarContainer = document.getElementById('searchBarContainer');
-            UIElements.monthControls = document.getElementById('monthControls');
-
-            UIElements.searchResultsModal = document.getElementById('searchResultsModal');
-            UIElements.searchResultsList = document.getElementById('searchResultsList');
-            UIElements.closeSearchResultsModalButton = document.getElementById('closeSearchResultsModalButton');
-
-            UIElements.calendarViewSection = document.getElementById('calendarViewSection');
-            UIElements.dayViewContainer = document.getElementById('dayViewContainer');
-            UIElements.dayViewDateTitle = document.getElementById('dayViewDateTitle');
-            UIElements.dayViewEventsList = document.getElementById('dayViewEventsList');
-            UIElements.addNewItemInDayViewButton = document.getElementById('addNewItemInDayViewButton');
-            UIElements.backToCalendarViewButton = document.getElementById('backToCalendarViewButton');
-            UIElements.resetDayButton = document.getElementById('resetDayButton');
-
-            UIElements.featureGuideModal = document.getElementById('featureGuideModal');
-            UIElements.closeFeatureGuideModalButton = document.getElementById('closeFeatureGuideModalButton');
-            UIElements.featureGuideModalContent = document.getElementById('featureGuideModalContent');
-        },
-        setActiveView: (view) => { 
-            AppState.currentView = view;
-            if (view === 'calendar') {
-                if (UIElements.calendarViewSection) UIElements.calendarViewSection.classList.remove('hidden');
-                if (UIElements.dayViewContainer) UIElements.dayViewContainer.classList.add('hidden');
-                Calendar.render(); 
-            } else if (view === 'day') {
-                if (UIElements.calendarViewSection) UIElements.calendarViewSection.classList.add('hidden');
-                if (UIElements.dayViewContainer) UIElements.dayViewContainer.classList.remove('hidden');
-            }
-        },
-        populateColorPicker: (selectedColorKey) => {
-            if (!UIElements.itineraryItemColorPicker) return;
-            UIElements.itineraryItemColorPicker.innerHTML = ''; // Clear previous swatches
-
-            Object.keys(COLOR_CLASSES).forEach(key => {
-                const colorInfo = COLOR_CLASSES[key];
-                const swatch = document.createElement('button');
-                swatch.type = 'button'; // Important for forms
-                swatch.className = `color-swatch ${colorInfo.bg}`;
-                swatch.dataset.colorKey = key;
-                swatch.title = colorInfo.name;
-                
-                const checkIcon = document.createElement('i');
-                checkIcon.className = 'fas fa-check text-xs'; // Font Awesome check icon
-                swatch.appendChild(checkIcon);
-
-                if (key === selectedColorKey) {
-                    swatch.classList.add('selected');
-                }
-                swatch.addEventListener('click', () => {
-                    AppState.selectedItemColorKey = key;
-                    // Update selected state on all swatches
-                    UIElements.itineraryItemColorPicker.querySelectorAll('.color-swatch').forEach(s => {
-                        s.classList.remove('selected');
-                    });
-                    swatch.classList.add('selected');
-                });
-                UIElements.itineraryItemColorPicker.appendChild(swatch);
-            });
-        },
-        toggleTimeSetting: (forceState) => {
-            AppState.isTimeSettingEnabled = typeof forceState === 'boolean' ? forceState : !AppState.isTimeSettingEnabled;
-            if (UIElements.timeSettingToggle && UIElements.timeInputsContainer && UIElements.timeSettingToggleKnob) {
-                if (AppState.isTimeSettingEnabled) {
-                    UIElements.timeSettingToggle.classList.remove('bg-gray-200');
-                    UIElements.timeSettingToggle.classList.add('bg-sky-600');
-                    UIElements.timeSettingToggleKnob.classList.remove('translate-x-1');
-                    UIElements.timeSettingToggleKnob.classList.add('translate-x-6'); 
-                    UIElements.timeInputsContainer.classList.remove('hidden');
-                    UIElements.timeSettingToggle.setAttribute('aria-checked', 'true');
-                } else {
-                    UIElements.timeSettingToggle.classList.add('bg-gray-200');
-                    UIElements.timeSettingToggle.classList.remove('bg-sky-600');
-                    UIElements.timeSettingToggleKnob.classList.add('translate-x-1');
-                    UIElements.timeSettingToggleKnob.classList.remove('translate-x-6');
-                    UIElements.timeInputsContainer.classList.add('hidden');
-                    UIElements.timeSettingToggle.setAttribute('aria-checked', 'false');
-                }
-            }
-        },
-        openItineraryItemModal: (dateStr, itemIdToEdit = null) => { 
-            if (!UIElements.itineraryItemModal) return;
-            
-            AppState.selectedDateForAssignment = dateStr; 
-            AppState.selectedItemColorKey = DEFAULT_COLOR_KEY; // Reset to default for new item
-            UIElements.itineraryItemsList.dataset.date = dateStr; 
-            
-            const modalTitleEl = UIElements.itineraryItemModal.querySelector('#itineraryItemModalTitle');
-            const [year, month, day] = dateStr.split('-');
-            const displayDate = new Date(year, parseInt(month)-1, day);
-            const formattedDate = displayDate.toLocaleDateString('zh-Hant-TW', { month: 'short', day: 'numeric', weekday: 'short'});
-
-            UIElements.newItineraryItemText.value = '';
-            UIElements.itineraryStartTime.value = '';
-            UIElements.itineraryEndTime.value = '';
-            UIElements.itineraryItemTags.value = ''; 
-            UIElements.itineraryItemLocation.value = '';
-            UIElements.addOrUpdateItineraryItemButton.innerHTML = '<i class="fas fa-plus mr-2"></i>新增項目';
-            if (modalTitleEl) modalTitleEl.textContent = `新增於 ${formattedDate}`;
-            AppState.editingItemId = null; 
-            let hasTime = false;
-
-            if (itemIdToEdit) {
-                const itemsOnDate = AppState.shifts[dateStr] || [];
-                const item = itemsOnDate.find(i => i.id === itemIdToEdit);
-                if (item) {
-                    UI.prepareEditItineraryItem(dateStr, item); 
-                    if (modalTitleEl) modalTitleEl.textContent = `編輯於 ${formattedDate}`;
-                    hasTime = !!item.startTime || !!item.endTime;
-                    AppState.selectedItemColorKey = item.color || DEFAULT_COLOR_KEY; // Set selected color
-                }
-            }
-            
-            UI.populateColorPicker(AppState.selectedItemColorKey); // Populate and set selected
-            UI.toggleTimeSetting(hasTime); 
-            UI.renderItineraryItemsInModal(dateStr); 
-            
-            UIElements.itineraryItemModal.style.display = 'flex';
-            UIElements.newItineraryItemText.focus();
-        },
-        closeItineraryItemModal: () => { 
-            if (UIElements.itineraryItemModal) UIElements.itineraryItemModal.style.display = 'none';
-            if (AppState.currentView === 'day' && AppState.selectedDayForDayView) {
-                DayView.renderDayViewItems(AppState.selectedDayForDayView);
-            }
-        },
-        renderItineraryItemsInModal: (dateStr) => { // List of OTHER items in the modal
-            if (!UIElements.itineraryItemsList) return;
-            UIElements.itineraryItemsList.innerHTML = ''; 
-            const items = [...(AppState.shifts[dateStr] || [])].sort((a,b) => (a.startTime || "23:59").localeCompare(b.startTime || "23:59"));
-
-            let visibleItems = 0;
-            items.forEach(item => {
-                if (item.id === AppState.editingItemId) return; // Don't show the item currently being edited
-
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'itinerary-modal-item'; 
-                
-                // Apply color border
-                const colorKey = item.color || DEFAULT_COLOR_KEY;
-                const colorInfo = COLOR_CLASSES[colorKey] || COLOR_CLASSES[DEFAULT_COLOR_KEY];
-                itemDiv.classList.add(colorInfo.border); // Assumes border color class like 'border-blue-500'
-
-                itemDiv.setAttribute('draggable', true); 
-                itemDiv.dataset.itemId = item.id; 
-                
-                const itemDetailsDiv = document.createElement('div');
-                itemDetailsDiv.className = 'item-details';
-
-                const itemDescriptionP = document.createElement('p');
-                itemDescriptionP.className = 'item-description text-sm';
-                try { 
-                    itemDescriptionP.innerHTML = (typeof marked !== 'undefined' && marked.parse) ? marked.parse(item.description || "").trim().replace(/<p>|<\/p>/g, "") : (item.description || "").trim(); 
-                } catch(e) { itemDescriptionP.textContent = (item.description || "").trim(); }
-                itemDetailsDiv.appendChild(itemDescriptionP);
-
-                if (item.startTime) {
-                    const itemTimeP = document.createElement('p');
-                    itemTimeP.className = 'item-time text-xs';
-                    itemTimeP.textContent = item.startTime + (item.endTime ? ` - ${item.endTime}` : '');
-                    itemDetailsDiv.appendChild(itemTimeP);
-                }
-                itemDiv.appendChild(itemDetailsDiv);
-
-                const buttonGroup = document.createElement('div');
-                buttonGroup.className = 'item-actions';
-
-                const editBtn = document.createElement('button');
-                editBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
-                editBtn.className = 'edit-btn rounded-md p-1.5 text-xs';
-                editBtn.title = '編輯此項目';
-                editBtn.onclick = (e) => { e.stopPropagation(); UI.openItineraryItemModal(dateStr, item.id); };
-                buttonGroup.appendChild(editBtn);
-                itemDiv.appendChild(buttonGroup);
-                UIElements.itineraryItemsList.appendChild(itemDiv);
-                visibleItems++;
-            });
-
-            if (visibleItems === 0) {
-                UIElements.itineraryItemsList.innerHTML = '<p class="text-sm text-slate-500 p-2 text-center">此日期無其他行程。</p>';
-            }
-             
-            if (visibleItems === 0 || (items.length <= 1 && AppState.editingItemId)) {
-                UIElements.itineraryItemsList.classList.add('hidden');
-            } else {
-                UIElements.itineraryItemsList.classList.remove('hidden');
-            }
-        },
-        prepareEditItineraryItem: (dateStr, itemToEdit) => { 
-            if (!UIElements.newItineraryItemText) return;
-            
-            AppState.editingItemId = itemToEdit.id; 
-            AppState.selectedDateForAssignment = dateStr; 
-            AppState.selectedItemColorKey = itemToEdit.color || DEFAULT_COLOR_KEY; // Set color for picker
-            
-            UIElements.newItineraryItemText.value = itemToEdit.description;
-            UIElements.itineraryStartTime.value = itemToEdit.startTime || "";
-            UIElements.itineraryEndTime.value = itemToEdit.endTime || "";
-            UIElements.itineraryItemTags.value = itemToEdit.tags ? itemToEdit.tags.join(', ') : "";
-            UIElements.itineraryItemLocation.value = itemToEdit.location || "";
-            
-            UIElements.addOrUpdateItineraryItemButton.innerHTML = '<i class="fas fa-save mr-2"></i>更新項目'; 
-            UI.toggleTimeSetting(!!(itemToEdit.startTime || itemToEdit.endTime)); 
-            UI.populateColorPicker(AppState.selectedItemColorKey); // Refresh picker with current item's color
-            UIElements.newItineraryItemText.focus(); 
-        },
-        addOrUpdateItineraryItem: () => { 
-            if (!AppState.selectedDateForAssignment || !UIElements.newItineraryItemText) return;
-            
-            const description = UIElements.newItineraryItemText.value.trim();
-            let startTime = UIElements.itineraryStartTime.value;
-            let endTime = UIElements.itineraryEndTime.value;
-            const tagsString = UIElements.itineraryItemTags.value.trim();
-            const tags = tagsString ? tagsString.split(/[,，\s]+/).map(tag => tag.trim()).filter(tag => tag) : [];
-            const location = UIElements.itineraryItemLocation.value.trim();
-            const color = AppState.selectedItemColorKey || DEFAULT_COLOR_KEY; // Get selected color
-
-            if (!description) { Utils.showCustomAlert("行程描述不可為空。", "info"); return; }
-
-            if (!AppState.isTimeSettingEnabled) { 
-                startTime = "";
-                endTime = "";
-            } else {
-                 if (endTime && !startTime) { Utils.showCustomAlert("若設定結束時間，請同時設定開始時間。", "info"); return; }
-                 if (startTime && endTime && endTime < startTime) { Utils.showCustomAlert("結束時間不可早於開始時間。", "info"); return; }
-            }
-
-            const dateStr = AppState.selectedDateForAssignment;
-            if (!AppState.shifts[dateStr]) AppState.shifts[dateStr] = [];
-
-            if (AppState.editingItemId) { 
-                const itemIndex = AppState.shifts[dateStr].findIndex(item => item.id === AppState.editingItemId);
-                if (itemIndex > -1) {
-                    AppState.shifts[dateStr][itemIndex].description = description;
-                    AppState.shifts[dateStr][itemIndex].startTime = startTime;
-                    AppState.shifts[dateStr][itemIndex].endTime = endTime;
-                    AppState.shifts[dateStr][itemIndex].tags = tags;
-                    AppState.shifts[dateStr][itemIndex].location = location;
-                    AppState.shifts[dateStr][itemIndex].color = color; // Save color
-                    Utils.showCustomAlert("行程項目已更新。", "success", 1500);
-                }
-            } else { 
-                const newItem = { 
-                    id: Utils.generateUUID(), description: description, startTime: startTime, 
-                    endTime: endTime, tags: tags, location: location, color: color // Save color
-                };
-                AppState.shifts[dateStr].push(newItem);
-                Utils.showCustomAlert("行程項目已新增。", "success", 1500);
-            }
-
-            DataStorage.saveDataForCurrentMonth();
-            
-            if (AppState.currentView === 'day' && AppState.selectedDayForDayView === dateStr) {
-                DayView.renderDayViewItems(dateStr);
-            }
-            Calendar.render(); 
-            UI.closeItineraryItemModal(); 
-        },
-        removeItineraryItem: (dateStr, itemId) => { 
-            if (!AppState.shifts[dateStr]) return;
-            AppState.shifts[dateStr] = AppState.shifts[dateStr].filter(item => item.id !== itemId);
-            if (AppState.shifts[dateStr].length === 0) delete AppState.shifts[dateStr]; 
-
-            DataStorage.saveDataForCurrentMonth();
-            
-            if (UIElements.itineraryItemModal.style.display === 'flex' && UIElements.itineraryItemsList.dataset.date === dateStr) {
-                UI.renderItineraryItemsInModal(dateStr); 
-            }
-            
-            if (AppState.currentView === 'day' && AppState.selectedDayForDayView === dateStr) {
-                DayView.renderDayViewItems(dateStr);
-            }
-            Calendar.render(); 
-
-            Utils.showCustomAlert("行程項目已刪除。", "success", 1500);
-
-            if (AppState.editingItemId === itemId) { 
-                UI.closeItineraryItemModal(); 
-            }
-        },
-        openManagementModal: () => { if (UIElements.managementModal) UIElements.managementModal.style.display = 'flex'; },
-        closeManagementModal: () => { if (UIElements.managementModal) UIElements.managementModal.style.display = 'none'; },
-        
-        openFeatureGuideModal: () => { if (UIElements.featureGuideModal) UIElements.featureGuideModal.style.display = 'flex';},
-        closeFeatureGuideModal: () => { if (UIElements.featureGuideModal) UIElements.featureGuideModal.style.display = 'none';},
-
-        showTooltip: (event, dateStr) => { 
-            if (!UIElements.dayTooltip || !UIElements.dayTooltipContent) return;
-            clearTimeout(AppState.tooltipTimeout); 
-
-            const items = AppState.shifts[dateStr] || [];
-            if (items.length === 0 && !AppState.holidays[dateStr]) { 
-                UI.hideTooltip(0); 
-                return;
-            }
-            UIElements.dayTooltipContent.innerHTML = ''; 
-            if (AppState.holidays[dateStr]) {
-                const holidayDiv = document.createElement('div');
-                holidayDiv.className = 'tooltip-item font-semibold text-orange-600';
-                holidayDiv.textContent = `假期: ${AppState.holidays[dateStr]}`;
-                UIElements.dayTooltipContent.appendChild(holidayDiv);
-            }
-            if (items.length > 0) {
-                items.slice(0, 3).forEach(item => { 
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'tooltip-item';
-                    let itemHTML = ""; 
-
-                    // Add color indicator to tooltip
-                    const itemColorKey = item.color || DEFAULT_COLOR_KEY;
-                    const itemColorInfo = COLOR_CLASSES[itemColorKey] || COLOR_CLASSES[DEFAULT_COLOR_KEY];
-                    itemHTML += `<span class="item-color-indicator ${itemColorInfo.bg}"></span>`;
-
-
-                    if (item.startTime) {
-                        itemHTML += `<span class="item-time">${item.startTime}</span>`;
-                        if (item.endTime) itemHTML += `<span class="item-time"> - ${item.endTime}</span>`;
-                        itemHTML += " ";
-                    }
-                    try { itemHTML += `<span class="item-description">${(typeof marked !== 'undefined' && marked.parse) ? marked.parse(item.description || "").replace(/<p>|<\/p>/g, "") : (item.description || "")}</span>`; } 
-                    catch(e) { itemHTML += `<span class="item-description">${item.description || ""}</span>`;}
-                    
-                    if (item.location) { itemHTML += `<div class="item-location-tooltip"><i class="fas fa-map-marker-alt mr-1"></i>${item.location}</div>`; }
-                    if (item.tags && item.tags.length > 0) {
-                        itemHTML += `<div class="item-tags-tooltip">`;
-                        item.tags.forEach(tag => { itemHTML += `<span class="tag">${tag}</span>`; });
-                        itemHTML += `</div>`;
-                    }
-                    itemDiv.innerHTML = itemHTML;
-                    UIElements.dayTooltipContent.appendChild(itemDiv);
-                });
-                if (items.length > 3) {
-                    const moreItemsDiv = document.createElement('div');
-                    moreItemsDiv.className = 'tooltip-item text-xs text-slate-500';
-                    moreItemsDiv.textContent = `還有 ${items.length - 3} 個項目...`;
-                    UIElements.dayTooltipContent.appendChild(moreItemsDiv);
-                }
-            } else if (!AppState.holidays[dateStr]) { 
-                 const noItemsDiv = document.createElement('div');
-                 noItemsDiv.className = 'tooltip-no-items';
-                 noItemsDiv.textContent = '本日無行程項目';
-                 UIElements.dayTooltipContent.appendChild(noItemsDiv);
-            }
-            const targetCell = event.currentTarget;
-            const cellRect = targetCell.getBoundingClientRect();
-            const tooltip = UIElements.dayTooltip;
-            tooltip.style.display = 'block'; 
-            const tooltipRect = tooltip.getBoundingClientRect();
-            let top = cellRect.bottom + window.scrollY + 5; 
-            let left = cellRect.left + window.scrollX;       
-            if (left + tooltipRect.width > window.innerWidth) {
-                left = window.innerWidth - tooltipRect.width - 10; 
-            }
-            if (top + tooltipRect.height > window.innerHeight && cellRect.top > tooltipRect.height + 5) {
-                top = cellRect.top + window.scrollY - tooltipRect.height - 5;
-            } else if (top + tooltipRect.height > window.innerHeight) {
-                 top = window.innerHeight - tooltipRect.height - 10;
-            }
-            if (left < 0) left = 5; 
-            if (top < 0) top = 5;   
-            tooltip.style.top = `${top}px`;
-            tooltip.style.left = `${left}px`;
-        },
-        hideTooltip: (delay = 100) => { 
-            if (AppState.tooltipTimeout) clearTimeout(AppState.tooltipTimeout);
-            AppState.tooltipTimeout = setTimeout(() => {
-                if (UIElements.dayTooltip) UIElements.dayTooltip.style.display = 'none';
-            }, delay); 
-        },
-        openSearchResultsModal: (results) => { 
-            if (!UIElements.searchResultsModal || !UIElements.searchResultsList) return;
-            UIElements.searchResultsList.innerHTML = ''; 
-            if (results.length === 0 && UIElements.searchInput && UIElements.searchInput.value.trim() === "") {
-                 UIElements.searchResultsList.innerHTML = `
-                    <div class="p-4 text-center">
-                        <input type="search" id="modalSearchInput" placeholder="請在此輸入搜尋關鍵字..." class="form-input w-full mb-3">
-                        <button id="modalSearchButton" type="button" class="form-button primary w-full">搜尋</button>
-                    </div>`;
-                const modalSearchInput = document.getElementById('modalSearchInput');
-                const modalSearchButton = document.getElementById('modalSearchButton');
-                if (modalSearchInput && modalSearchButton) {
-                    modalSearchInput.addEventListener('keypress', (event) => {
-                        if (event.key === 'Enter') {
-                            UIElements.searchInput.value = modalSearchInput.value; 
-                            Search.performSearch(); 
-                        }
-                    });
-                    modalSearchButton.addEventListener('click', () => {
-                        UIElements.searchInput.value = modalSearchInput.value;
-                        Search.performSearch();
-                    });
-                    setTimeout(() => modalSearchInput.focus(), 0);
-                }
-
-            } else if (results.length === 0) {
-                UIElements.searchResultsList.innerHTML = '<p class="text-slate-500 p-4 text-center">找不到符合條件的行程項目。</p>';
-            } else {
-                results.forEach(result => {
-                    const itemEl = document.createElement('div');
-                    itemEl.className = 'search-result-item';
-                    let content = `<div class="search-result-date">${result.date}</div>`;
-                    
-                    const itemColorKey = result.item.color || DEFAULT_COLOR_KEY;
-                    const itemColorInfo = COLOR_CLASSES[itemColorKey] || COLOR_CLASSES[DEFAULT_COLOR_KEY];
-                    content += `<span class="item-color-indicator ${itemColorInfo.bg} mr-2"></span>`;
-
-                    if (result.item.startTime) {
-                        content += `<span class="item-time">${result.item.startTime}</span>`;
-                        if (result.item.endTime) content += `<span class="item-time"> - ${result.item.endTime}</span>`;
-                        content += " ";
-                    }
-                    try {
-                        content += `<div class="search-result-description inline">${(typeof marked !== 'undefined' && marked.parse) ? marked.parse(result.item.description || "") : (result.item.description || "")}</div>`;
-                    } catch (e) {
-                        content += `<div class="search-result-description inline">${result.item.description || ""}</div>`;
-                    }
-                    if (result.item.location) {
-                        content += `<div class="item-location-tooltip text-sm"><i class="fas fa-map-marker-alt mr-1"></i>${result.item.location}</div>`;
-                    }
-                    if (result.item.tags && result.item.tags.length > 0) {
-                        content += `<div class="item-tags-tooltip text-sm">`;
-                        result.item.tags.forEach(tag => { content += `<span class="tag">${tag}</span>`; });
-                        content += `</div>`;
-                    }
-                    itemEl.innerHTML = content;
-                    itemEl.onclick = () => {
-                        UI.closeSearchResultsModal();
-                        const [year, month, day] = result.date.split('-').map(Number);
-                        if (AppState.currentYear !== year || AppState.currentMonth !== month -1) {
-                            AppState.currentYear = year;
-                            AppState.currentMonth = month - 1;
-                            DataStorage.loadDataForCurrentMonth(); 
-                        }
-                        DayView.openDayView(result.date);
-                    };
-                    UIElements.searchResultsList.appendChild(itemEl);
-                });
-            }
-            UIElements.searchResultsModal.style.display = 'flex';
-        },
-        closeSearchResultsModal: () => {
-            if (UIElements.searchResultsModal) UIElements.searchResultsModal.style.display = 'none';
-        }
-    };
-
-    // DayView Module
-    const DayView = {
-        openDayView: (dateStr) => {
-            AppState.selectedDayForDayView = dateStr;
-            UI.setActiveView('day'); 
-            if (UIElements.dayViewDateTitle) {
-                const [year, month, day] = dateStr.split('-');
-                const d = new Date(year, parseInt(month)-1, parseInt(day));
-                const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-                UIElements.dayViewDateTitle.textContent = `${d.toLocaleDateString('zh-Hant-TW', options)} 行程`;
-            }
-            DayView.renderDayViewItems(dateStr);
-            if (UIElements.addNewItemInDayViewButton) {
-                UIElements.addNewItemInDayViewButton.onclick = () => UI.openItineraryItemModal(dateStr);
-            }
-        },
-        closeDayView: () => {
-            UI.setActiveView('calendar');
-            AppState.selectedDayForDayView = null;
-        },
-        renderDayViewItems: (dateStr) => {
-            if (!UIElements.dayViewEventsList) return;
-            UIElements.dayViewEventsList.innerHTML = '';
-            const items = [...(AppState.shifts[dateStr] || [])].sort((a,b) => (a.startTime || "23:59").localeCompare(b.startTime || "23:59")); 
-
-            if (AppState.holidays[dateStr]) {
-                 const holidayDiv = document.createElement('div');
-                 holidayDiv.className = 'day-view-item bg-amber-50 border-amber-200'; 
-                 holidayDiv.innerHTML = `<div class="item-details"><p class="item-description font-semibold text-amber-700"><i class="fas fa-star mr-2"></i>假期: ${AppState.holidays[dateStr]}</p></div>`;
-                 UIElements.dayViewEventsList.appendChild(holidayDiv);
-            }
-
-            if (items.length === 0 && !AppState.holidays[dateStr]) { 
-                UIElements.dayViewEventsList.innerHTML = '<p class="day-view-no-items">本日無行程項目。</p>';
-                return;
-            }
-
-            items.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'day-view-item'; // Base class
-                itemDiv.dataset.itemId = item.id;
-
-                // Apply color border
-                const colorKey = item.color || DEFAULT_COLOR_KEY;
-                const colorInfo = COLOR_CLASSES[colorKey] || COLOR_CLASSES[DEFAULT_COLOR_KEY];
-                itemDiv.classList.add(colorInfo.border);
-
-
-                const detailsDiv = document.createElement('div');
-                detailsDiv.className = 'item-details';
-                if (item.startTime) {
-                    const timeP = document.createElement('p');
-                    timeP.className = 'item-time';
-                    timeP.textContent = item.startTime + (item.endTime ? ` - ${item.endTime}` : '');
-                    detailsDiv.appendChild(timeP);
-                }
-                const descriptionP = document.createElement('div'); 
-                descriptionP.className = 'item-description';
-                try {
-                    descriptionP.innerHTML = (typeof marked !== 'undefined' && marked.parse) ? marked.parse(item.description || "") : (item.description || "");
-                } catch(e) { descriptionP.textContent = item.description || ""; }
-                detailsDiv.appendChild(descriptionP);
-                if (item.location) {
-                    const locationP = document.createElement('p');
-                    locationP.className = 'item-location';
-                    locationP.innerHTML = `<i class="fas fa-map-marker-alt mr-1"></i>${item.location}`;
-                    detailsDiv.appendChild(locationP);
-                }
-                if (item.tags && item.tags.length > 0) {
-                    const tagsDiv = document.createElement('div');
-                    tagsDiv.className = 'item-tags';
-                    item.tags.forEach(tag => {
-                        const tagSpan = document.createElement('span');
-                        tagSpan.className = 'tag';
-                        tagSpan.textContent = tag;
-                        tagsDiv.appendChild(tagSpan);
-                    });
-                    detailsDiv.appendChild(tagsDiv);
-                }
-                itemDiv.appendChild(detailsDiv);
-                const actionsDiv = document.createElement('div');
-                actionsDiv.className = 'item-actions';
-                const editBtn = document.createElement('button');
-                editBtn.innerHTML = '<i class="fas fa-edit mr-1"></i>編輯';
-                editBtn.className = 'edit-btn form-button primary text-xs'; 
-                editBtn.onclick = () => UI.openItineraryItemModal(dateStr, item.id);
-                actionsDiv.appendChild(editBtn);
-                const deleteBtn = document.createElement('button');
-                deleteBtn.innerHTML = '<i class="fas fa-trash-alt mr-1"></i>刪除';
-                deleteBtn.className = 'delete-btn form-button danger text-xs'; 
-                deleteBtn.onclick = () => {
-                    if (confirm(`確定要刪除此行程項目嗎？\n"${item.description.substring(0,50)}..."`)) {
-                        UI.removeItineraryItem(dateStr, item.id);
-                    }
-                };
-                actionsDiv.appendChild(deleteBtn);
-                itemDiv.appendChild(actionsDiv);
-                UIElements.dayViewEventsList.appendChild(itemDiv);
-            });
-        },
-        clearDay: () => {
-            const dateToClear = AppState.selectedDayForDayView;
-            if (!dateToClear) {
-                Utils.showCustomAlert("沒有選定的日期可供清除。", "info");
-                return;
-            }
-            if (confirm(`您確定要清除 ${dateToClear} 的所有行程項目和假期標記嗎？此操作無法復原。`)) {
-                let itemsCleared = false;
-                let holidayCleared = false;
-                if (AppState.shifts[dateToClear] && AppState.shifts[dateToClear].length > 0) {
-                    delete AppState.shifts[dateToClear];
-                    itemsCleared = true;
-                }
-                if (AppState.holidays[dateToClear]) {
-                    delete AppState.holidays[dateToClear];
-                    holidayCleared = true;
-                }
-                if (itemsCleared || holidayCleared) {
-                    DataStorage.saveDataForCurrentMonth(); 
-                    DayView.renderDayViewItems(dateToClear); 
-                    Calendar.render(); 
-                    Utils.showCustomAlert(`${dateToClear} 的資料已成功清除。`, "success");
-                } else {
-                    Utils.showCustomAlert(`${dateToClear} 沒有可清除的資料。`, "info");
-                }
-            }
-        }
-    };
-
-    // DragDrop
-    const DragDrop = { 
-        init: () => {
-            const list = UIElements.itineraryItemsList; 
-            if (list) { 
-                list.addEventListener('dragstart', DragDrop.handleDragStart);
-                list.addEventListener('dragover', DragDrop.handleDragOver);
-                list.addEventListener('drop', DragDrop.handleDrop);
-                list.addEventListener('dragend', DragDrop.handleDragEnd);
-            }
-        },
-        handleDragStart: (e) => {
-            const targetItem = e.target.closest('.itinerary-modal-item');
-            if (targetItem && targetItem.dataset.itemId) {
-                AppState.draggedItemId = targetItem.dataset.itemId;
-                e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/plain', AppState.draggedItemId); 
-                setTimeout(() => targetItem.classList.add('dragging'), 0); 
-            } else { e.preventDefault(); }
-        },
-        handleDragOver: (e) => {
-            e.preventDefault(); 
-            e.dataTransfer.dropEffect = 'move';
-            const list = UIElements.itineraryItemsList;
-            if(!list) return;
-            const draggingItem = list.querySelector('.dragging');
-            if (!draggingItem) return;
-            const siblings = [...list.querySelectorAll('.itinerary-modal-item:not(.dragging)')];
-            let nextSibling = siblings.find(sibling => e.clientY < sibling.getBoundingClientRect().top + sibling.getBoundingClientRect().height / 2);
-            siblings.forEach(s => s.classList.remove('drag-over'));
-            if (nextSibling) { nextSibling.classList.add('drag-over');} 
-        },
-        handleDrop: (e) => {
-            e.preventDefault();
-            const dateStr = UIElements.itineraryItemsList ? UIElements.itineraryItemsList.dataset.date : null;
-            if (!dateStr || !AppState.draggedItemId) return;
-            const items = AppState.shifts[dateStr] || [];
-            if (items.length === 0) return;
-            const draggedItemIndex = items.findIndex(item => item.id === AppState.draggedItemId);
-            if (draggedItemIndex === -1) return;
-            const draggedItem = items.splice(draggedItemIndex, 1)[0]; 
-            let targetIndex;
-            const targetItemElement = e.target.closest('.itinerary-modal-item:not(.dragging)');
-            if (targetItemElement && targetItemElement.dataset.itemId) {
-                const targetItemId = targetItemElement.dataset.itemId;
-                targetIndex = items.findIndex(item => item.id === targetItemId);
-                const rect = targetItemElement.getBoundingClientRect();
-                if (e.clientY >= rect.top + rect.height / 2) { targetIndex++; }
-            } else {
-                const list = UIElements.itineraryItemsList;
-                const siblings = list ? [...list.querySelectorAll('.itinerary-modal-item:not(.dragging)')] : [];
-                const nextSiblingElement = siblings.find(sibling => e.clientY < sibling.getBoundingClientRect().top + sibling.getBoundingClientRect().height / 2);
-                if (nextSiblingElement && nextSiblingElement.dataset.itemId) {
-                    targetIndex = items.findIndex(item => item.id === nextSiblingElement.dataset.itemId);
-                } else { targetIndex = items.length; }
-            }
-            items.splice(targetIndex, 0, draggedItem); 
-            AppState.shifts[dateStr] = items;
-            DataStorage.saveDataForCurrentMonth();
-            UI.renderItineraryItemsInModal(dateStr); 
-            Calendar.render(); 
-            if (AppState.currentView === 'day' && AppState.selectedDayForDayView === dateStr) {
-                DayView.renderDayViewItems(dateStr); 
-            }
-        },
-        handleDragEnd: (e) => {
-            const targetItem = e.target.closest('.itinerary-modal-item');
-            if (targetItem) targetItem.classList.remove('dragging');
-            const list = UIElements.itineraryItemsList;
-            if(list) { [...list.querySelectorAll('.itinerary-modal-item')].forEach(s => s.classList.remove('drag-over'));}
-            AppState.draggedItemId = null;
-        }
-    };
-
-    // Exporter
-    const Exporter = { 
-        exportItineraryToICS: () => {
-            let eventsToExport = [];
-            const currentMonthPrefix = `${AppState.currentYear}-${String(AppState.currentMonth + 1).padStart(2, '0')}`;
-            for (const dateStr in AppState.shifts) {
-                if (dateStr.startsWith(currentMonthPrefix) && AppState.shifts[dateStr]) {
-                    const itemsOnDate = AppState.shifts[dateStr];
-                    itemsOnDate.forEach(item => {
-                        eventsToExport.push({ 
-                            date: dateStr, description: item.description, id: item.id, 
-                            startTime: item.startTime, endTime: item.endTime,
-                            tags: item.tags, location: item.location,
-                            color: item.color // Include color in export if needed by other apps
-                        });
-                    });
-                }
-            }
-            if (eventsToExport.length === 0) { Utils.showCustomAlert("本月沒有行程表項目可供匯出。", "info"); return; }
-            let icsEvents = [ 'BEGIN:VCALENDAR', 'VERSION:2.0', `PRODID:-//PersonalItineraryTool//${Utils.getLocalStorageKey('').split('_')[1]}//ZH` ];
-            eventsToExport.forEach(eventData => {
-                const dateParts = eventData.date.split('-'); 
-                if (dateParts.length !== 3) return; 
-                const year = parseInt(dateParts[0]), month = parseInt(dateParts[1]) - 1, day = parseInt(dateParts[2]); 
-                let dtStartStr, dtEndStr;
-                const baseDate = `${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}`; 
-                if (eventData.startTime) {
-                    const startTimeStr = eventData.startTime.replace(':', '') + '00'; 
-                    dtStartStr = `DTSTART;TZID=Asia/Taipei:${baseDate}T${startTimeStr}`; 
-                    if (eventData.endTime) {
-                        const endTimeStr = eventData.endTime.replace(':', '') + '00';
-                        dtEndStr = `DTEND;TZID=Asia/Taipei:${baseDate}T${endTimeStr}`;
-                    } else { 
-                        const startHour = parseInt(eventData.startTime.split(':')[0]);
-                        const startMinute = parseInt(eventData.startTime.split(':')[1]);
-                        let endHour = startHour + 1; let endMinute = startMinute;
-                        if (endHour >= 24) { endHour = 23; endMinute = 59; } 
-                        dtEndStr = `DTEND;TZID=Asia/Taipei:${baseDate}T${String(endHour).padStart(2, '0')}${String(endMinute).padStart(2, '0')}00`;
-                    }
-                } else { 
-                    dtStartStr = `DTSTART;VALUE=DATE:${baseDate}`;
-                    const nextDayDate = new Date(Date.UTC(year, month, day + 1));
-                    dtEndStr = `DTEND;VALUE=DATE:${nextDayDate.getUTCFullYear()}${String(nextDayDate.getUTCMonth() + 1).padStart(2, '0')}${String(nextDayDate.getUTCDate()).padStart(2, '0')}`;
-                }
-                let eventSummary = eventData.description.split('\n')[0]; 
-                let eventDescription = eventData.description; 
-                if (eventData.location) { eventDescription += `\n地點: ${eventData.location}`; }
-                if (eventData.tags && eventData.tags.length > 0) { eventDescription += `\n標籤: ${eventData.tags.join(', ')}`;}
-                if (eventData.color && eventData.color !== DEFAULT_COLOR_KEY) {
-                    eventDescription += `\n顏色標籤: ${COLOR_CLASSES[eventData.color]?.name || eventData.color}`;
-                }
-                icsEvents.push('BEGIN:VEVENT');
-                icsEvents.push(`UID:itinerary-${eventData.date}-${eventData.id}@personaltool.local`); 
-                icsEvents.push(`DTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '').substring(0, 15)}Z`); 
-                icsEvents.push(dtStartStr); icsEvents.push(dtEndStr);
-                icsEvents.push(`SUMMARY:${eventSummary.replace(/\n/g, "\\n")}`); 
-                icsEvents.push(`DESCRIPTION:${eventDescription.replace(/\n/g, "\\n")}`); 
-                if (eventData.location) { icsEvents.push(`LOCATION:${eventData.location.replace(/\n/g, "\\n")}`);}
-                // Standard .ics doesn't have a direct "COLOR" property in the way we use it,
-                // but some calendar apps might interpret X-APPLE-CALENDAR-COLOR or similar.
-                // For simplicity, we're adding it to the description.
-                icsEvents.push('END:VEVENT');
-            });
-            icsEvents.push('END:VCALENDAR');
-            const icsContent = icsEvents.join('\r\n');
-            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            let filenamePart = `個人行程表_${AppState.currentYear}${String(AppState.currentMonth + 1).padStart(2, '0')}`;
-            link.download = `${filenamePart}.ics`;
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-            URL.revokeObjectURL(link.href); 
-            Utils.showCustomAlert("行程表已匯出為 .ics 檔案。", "success");
-        }
-    };
-    
-    // Search Functionality
-    const Search = {
-        performSearch: () => {
-            if (!UIElements.searchInput) return; 
-            let query = UIElements.searchInput.value.trim().toLowerCase();
-            const modalSearchInput = document.getElementById('modalSearchInput');
-            if (UIElements.searchResultsModal.style.display === 'flex' && modalSearchInput && modalSearchInput.value.trim() !== '') {
-                query = modalSearchInput.value.trim().toLowerCase();
-            }
-
-            if (!query) { 
-                UI.openSearchResultsModal([]); 
-                UIElements.searchResultsList.innerHTML = '<p class="text-slate-500 p-4 text-center">請輸入搜尋關鍵字。</p>';
-                return;
-            }
-            const results = [];
-            for (const dateStr in AppState.shifts) {
-                if (AppState.shifts.hasOwnProperty(dateStr)) {
-                    const itemsOnDate = AppState.shifts[dateStr];
-                    itemsOnDate.forEach(item => {
-                        let match = false;
-                        if (item.description && item.description.toLowerCase().includes(query)) { match = true; }
-                        if (!match && item.location && item.location.toLowerCase().includes(query)) { match = true; }
-                        if (!match && item.tags && item.tags.some(tag => tag.toLowerCase().includes(query))) { match = true;}
-                        if (match) { results.push({ date: dateStr, item: { ...item } }); }
-                    });
-                }
-            }
-            results.sort((a,b) => a.date.localeCompare(b.date));
-            UI.openSearchResultsModal(results); 
-        }
-    };
-
-    // Initialization
-    document.addEventListener('DOMContentLoaded', () => {
-        UI.cacheDOMElements();
-        if (UIElements.itineraryItemsList) { DragDrop.init(); } 
-        DataStorage.loadDataForCurrentMonth(); 
-        UI.setActiveView('calendar'); 
-
-        if(UIElements.userAvatarButton) UIElements.userAvatarButton.addEventListener('click', UI.openFeatureGuideModal);
-        if(UIElements.closeFeatureGuideModalButton) UIElements.closeFeatureGuideModalButton.addEventListener('click', UI.closeFeatureGuideModal);
-
-
-        if (UIElements.searchButtonNav) UIElements.searchButtonNav.addEventListener('click', () => {
-            UIElements.searchInput.value = ''; 
-            Search.performSearch(); 
-        });
-        if (UIElements.todayButtonNav) UIElements.todayButtonNav.addEventListener('click', Calendar.goToToday);
-        if (UIElements.openManagementModalButtonNav) UIElements.openManagementModalButtonNav.addEventListener('click', UI.openManagementModal);
-
-        if (UIElements.saveNotesButton) {
-            UIElements.saveNotesButton.addEventListener('click', () => {
-                if (UIElements.scheduleNotesTextarea) AppState.notes = UIElements.scheduleNotesTextarea.value;
-                DataStorage.saveDataForCurrentMonth();
-                Utils.showCustomAlert("備註已儲存。", "success", 2000);
-            });
-        }
-        if (UIElements.closeManagementModalButton) UIElements.closeManagementModalButton.addEventListener('click', UI.closeManagementModal);
-        
-        if (UIElements.saveItineraryButton) { 
-            UIElements.saveItineraryButton.addEventListener('click', () => {
-                if (UIElements.scheduleNotesTextarea) AppState.notes = UIElements.scheduleNotesTextarea.value; 
-                DataStorage.saveDataForCurrentMonth();
-                Utils.showCustomAlert("行程表資料已儲存。", "success");
-                UI.closeManagementModal();
-            });
-        }
-        if (UIElements.clearItineraryButton) { 
-            UIElements.clearItineraryButton.addEventListener('click', () => {
-                if (confirm(`您確定要清除 ${AppState.currentYear}年 ${AppState.currentMonth + 1}月 的所有行程表資料和備註嗎？此操作無法復原。`)) {
-                    DataStorage.clearCurrentMonthItinerary();
-                }
-            });
-        }
-        if (UIElements.addOrUpdateItineraryItemButton) UIElements.addOrUpdateItineraryItemButton.addEventListener('click', UI.addOrUpdateItineraryItem);
-        if (UIElements.closeItineraryItemModalButton) UIElements.closeItineraryItemModalButton.addEventListener('click', UI.closeItineraryItemModal);
-        if (UIElements.timeSettingToggle) UIElements.timeSettingToggle.addEventListener('click', () => UI.toggleTimeSetting());
-        
-        if (UIElements.newItineraryItemText) { 
-             UIElements.newItineraryItemText.addEventListener('keypress', (event) => {
-                if (event.key === 'Enter' && !event.shiftKey) {
-                    event.preventDefault(); 
-                    UI.addOrUpdateItineraryItem();
-                }
-            });
-        }
-        if (UIElements.closeSearchResultsModalButton) UIElements.closeSearchResultsModalButton.addEventListener('click', UI.closeSearchResultsModal);
-
-        if (UIElements.backToCalendarViewButton) UIElements.backToCalendarViewButton.addEventListener('click', DayView.closeDayView);
-        if (UIElements.resetDayButton) UIElements.resetDayButton.addEventListener('click', DayView.clearDay); 
-
-        window.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
-                if (UIElements.itineraryItemModal && UIElements.itineraryItemModal.style.display === 'flex') UI.closeItineraryItemModal();
-                if (UIElements.managementModal && UIElements.managementModal.style.display === 'flex') UI.closeManagementModal();
-                if (UIElements.searchResultsModal && UIElements.searchResultsModal.style.display === 'flex') UI.closeSearchResultsModal();
-                if (UIElements.featureGuideModal && UIElements.featureGuideModal.style.display === 'flex') UI.closeFeatureGuideModal();
-                UI.hideTooltip(0); 
-            }
-        });
-        window.onclick = function(event) { 
-            if (UIElements.itineraryItemModal && event.target == UIElements.itineraryItemModal) UI.closeItineraryItemModal();
-            if (UIElements.managementModal && event.target == UIElements.managementModal) UI.closeManagementModal();
-            if (UIElements.searchResultsModal && event.target == UIElements.searchResultsModal) UI.closeSearchResultsModal();
-            if (UIElements.featureGuideModal && event.target == UIElements.featureGuideModal) UI.closeFeatureGuideModal();
-        }
-        
-        if(UIElements.calendarGrid) UIElements.calendarGrid.addEventListener('mouseleave', () => UI.hideTooltip());
-        window.addEventListener('blur', () => UI.hideTooltip(0)); 
-    });
-    </script>
 </body>
 </html>
-<div style="text-align: center;">
- Copyright © Jean Giono 
-</div>
+

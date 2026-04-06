@@ -3,41 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>北歐奶茶風 旗艦綜合平面圖 - 名人世界專屬</title>
+    <title>北歐奶茶風 - 互動式分層施工圖</title>
     <style>
         :root {
-            /* 空間與材質色彩 (北歐奶茶風) */
+            /* 空間與材質色彩 */
             --bg-color: #fcfbf9;
-            --wall-color: #8c7f75;      /* 牆壁：奶茶灰棕 */
-            --wet-wall: #706359;        /* 共用水牆加深標示 */
-            --balcony-floor: #e3ddd5;   
-            --floor-wood: #f8f4ef;      /* 燕麥奶白木地板 */
-            --floor-tile: #f0ebe4;      /* 衛浴廚房磁磚 */
+            --wall-color: #5c5046;
+            --wet-wall: #8c7f75;
+            --floor-wood: #f8f4ef;
+            --floor-tile: #f0ebe4;
             
-            /* 家具色彩 (奶茶/原木色系) */
-            --furn-wood: #e3d1be;       /* 淺橡木 */
-            --furn-wood-dark: #ccb7a1;  /* 焦糖奶茶色 */
-            --furn-wood-light: #f0e2d1; /* 樺木色 (NORDEN) */
-            --furn-sofa: #cfc7bd;       /* 燕麥灰 (KIVIK) */
-            --furn-bed: #fdfcf9;        /* 奶油白寢具 */
-            --furn-wardrobe: #d9cabd;   /* 奶茶色衣櫃 */
-            --furn-bath: #ffffff;       
-            --furn-kitchen: #e6dfd8;    
+            /* 家具與櫃體色彩 */
+            --furn-wood: #e3d1be;
+            --furn-wood-dark: #ccb7a1;
+            --furn-sofa: #cfc7bd;
+            --furn-bed: #fdfcf9;
+            --furn-wardrobe: #d9cabd;
             
-            /* MEP 機電管線標示色彩 */
-            --mep-beam: #f1c40f;        /* 木作假樑範圍 (黃色半透明) */
-            --mep-ac: #3498db;          /* 冷氣 (藍色) */
-            --mep-fresh: #27ae60;       /* 新風機 (綠色) */
+            /* 機電 MEP 色彩 */
+            --mep-beam: #f1c40f;
+            --mep-ac: #3498db;
+            --mep-fresh: #27ae60;
+            --pipe-cold: #0984e3;
+            --pipe-hot: #d63031;
+            --pipe-drain: #00b894;
+            --pipe-acd: #00cec9;
+
+            /* 天花板色彩 */
+            --ceil-28: #ffffff;
+            --ceil-26: #d8c8b8;
+            --ceil-24: #e3dcd5;
             
-            /* 標註線與文字 */
-            --dim-line: #b0a092;        
-            --text-color: #5c5046;      
+            /* UI 顏色 */
+            --primary: #8c7f75;
+            --primary-hover: #706359;
+            --text-main: #332b24;
         }
 
         body {
             margin: 0;
             padding: 20px;
-            background-color: var(--bg-color);
+            background-color: #e5dfd8;
             font-family: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
             display: flex;
             flex-direction: column;
@@ -48,7 +54,7 @@
         .header {
             text-align: center;
             margin-bottom: 20px;
-            color: var(--text-color);
+            color: var(--text-main);
         }
 
         .header h1 {
@@ -57,13 +63,40 @@
             letter-spacing: 2px;
         }
 
-        .header p {
-            margin: 0;
-            font-size: 14px;
-            color: #8c7f75;
-            line-height: 1.6;
+        /* Tabs UI */
+        .tabs-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 1200px;
         }
 
+        .tab-btn {
+            background-color: #fff;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background-color: #f4ede6;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(140, 127, 117, 0.4);
+        }
+
+        /* Legend UI */
         .legend-container {
             display: flex;
             flex-wrap: wrap;
@@ -72,9 +105,11 @@
             background: white;
             padding: 15px 25px;
             border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(180, 170, 160, 0.15);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 20px;
             max-width: 1200px;
+            min-height: 24px;
+            transition: opacity 0.3s ease;
         }
 
         .legend-item {
@@ -90,8 +125,25 @@
             height: 18px;
             margin-right: 8px;
             border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+        
+        .legend-line {
+            width: 24px;
+            height: 4px;
+            margin-right: 8px;
         }
 
+        .legend-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Canvas */
         .canvas-container {
             background-color: white;
             padding: 20px;
@@ -109,363 +161,394 @@
             display: block;
         }
 
-        .room-title {
-            font-size: 32px;
-            font-weight: bold;
-            fill: rgba(140, 127, 117, 0.08);
-            text-anchor: middle;
-            dominant-baseline: middle;
-            letter-spacing: 8px;
-        }
-
-        .furn-label {
-            font-size: 14px;
-            font-weight: 600;
-            fill: #ffffff;
-            text-anchor: middle;
-            dominant-baseline: middle;
-            letter-spacing: 1px;
-            text-shadow: 1px 1px 2px rgba(100, 90, 80, 0.3);
-        }
-
-        .furn-label-dark {
-            font-size: 14px;
-            font-weight: 600;
-            fill: var(--text-color);
-            text-anchor: middle;
-            dominant-baseline: middle;
-            letter-spacing: 1px;
-        }
-
-        .dim-text {
-            font-size: 18px;
-            font-weight: bold;
-            fill: var(--dim-line);
-            text-anchor: middle;
-            dominant-baseline: middle;
-            letter-spacing: 1px;
-        }
-
-        .small-label {
-            font-size: 12px;
-            fill: var(--text-color);
-            text-anchor: middle;
-            dominant-baseline: middle;
-            font-weight: bold;
-        }
+        /* SVG Text Styles */
+        .dim-text { font-size: 18px; font-weight: bold; fill: #b0a092; text-anchor: middle; dominant-baseline: middle; }
+        .furn-label { font-size: 14px; font-weight: bold; fill: #fff; text-anchor: middle; dominant-baseline: middle; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); }
+        .furn-label-dark { font-size: 14px; font-weight: bold; fill: var(--text-main); text-anchor: middle; dominant-baseline: middle; }
+        .small-label { font-size: 12px; font-weight: bold; fill: var(--text-main); text-anchor: middle; dominant-baseline: middle; }
         
-        .mep-label {
-            font-size: 11px;
-            font-weight: bold;
-            fill: #d35400;
-            letter-spacing: 1px;
+        /* Layer transitions */
+        g[id^="layer-"] {
+            transition: opacity 0.4s ease;
+        }
+
+        /* "All" Mode specifics to avoid clutter */
+        .mode-all #layer-ceiling .ceil-zone {
+            fill-opacity: 0.15;
+            stroke-opacity: 0.3;
+        }
+        .mode-all #layer-mep .pipe-line {
+            opacity: 0.4;
         }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>北歐奶茶風 旗艦綜合平面圖 (Master Plan)</h1>
-        <p>名人世界 15.86 坪物件最適解 ｜ 1:1 家具實體化 × 共用水牆工法 × 機電包管路徑</p>
+        <h1>北歐奶茶風 互動式分層施工圖</h1>
+        <p>請點選下方分頁，檢視各別工種的專屬配置圖面</p>
     </div>
 
-    <!-- 圖例說明 -->
-    <div class="legend-container">
-        <div class="legend-item"><div class="legend-box" style="background: url(#concrete-pattern); border: 1px solid var(--wall-color);"></div>15cm 廚衛共用水牆 (濕式輕隔間)</div>
-        <div class="legend-item"><div class="legend-box" style="background: var(--mep-beam); opacity: 0.3; border: 1px dashed #d35400;"></div>H=2.6m 天花板假樑 (藏冷氣/新風管線)</div>
-        <div class="legend-item"><div class="legend-box" style="background: none; border: 2px dashed var(--mep-ac);"></div>1對1 冷氣室內/外機</div>
-        <div class="legend-item"><div class="legend-box" style="background: none; border: 2px dashed var(--mep-fresh);"></div>正壓新風主機</div>
-        <div class="legend-item"><div class="legend-box" style="background: var(--furn-sofa);"></div>實體化家具 (KIVIK / NORDEN / Queen Bed)</div>
+    <!-- Tabs -->
+    <div class="tabs-container" id="tabs">
+        <button class="tab-btn active" data-layer="all">綜合全圖</button>
+        <button class="tab-btn" data-layer="masonry">① 泥作與結構</button>
+        <button class="tab-btn" data-layer="mep">② 水電與空調</button>
+        <button class="tab-btn" data-layer="ceiling">③ 天花板與照明</button>
+        <button class="tab-btn" data-layer="cabinetry">④ 系統櫃與設備</button>
+        <button class="tab-btn" data-layer="furniture">⑤ 軟裝與家具</button>
     </div>
 
+    <!-- Dynamic Legend -->
+    <div class="legend-container" id="legend">
+        <!-- JS 會根據選擇的 Tab 注入對應的圖例 -->
+    </div>
+
+    <!-- Canvas -->
     <div class="canvas-container">
-        <!-- SVG 畫布 1px = 1cm -->
-        <svg viewBox="-80 -80 1350 600" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="-80 -80 1350 600" xmlns="http://www.w3.org/2000/svg" id="master-svg" class="mode-all">
             
             <defs>
-                <!-- 箭頭標記 -->
-                <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto">
-                    <path d="M9,0 L0,3 L9,6 z" fill="var(--dim-line)" />
-                </marker>
-                <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                    <path d="M0,0 L9,3 L0,6 z" fill="var(--dim-line)" />
-                </marker>
+                <!-- Markers -->
+                <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto"><path d="M9,0 L0,3 L9,6 z" fill="#b0a092" /></marker>
+                <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L9,3 L0,6 z" fill="#b0a092" /></marker>
+                <marker id="arrow-drain" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--pipe-drain)" /></marker>
 
-                <!-- 紋理材質 -->
+                <!-- Patterns -->
                 <pattern id="wood-floor" width="40" height="120" patternUnits="userSpaceOnUse">
                     <rect width="40" height="120" fill="var(--floor-wood)"/>
                     <line x1="0" y1="0" x2="0" y2="120" stroke="#ede5db" stroke-width="1"/>
                     <line x1="0" y1="60" x2="40" y2="60" stroke="#ede5db" stroke-width="1"/>
                 </pattern>
-                
                 <pattern id="tile-floor" width="40" height="40" patternUnits="userSpaceOnUse">
                     <rect width="40" height="40" fill="var(--floor-tile)"/>
                     <rect width="40" height="40" fill="none" stroke="#e0d7cd" stroke-width="1"/>
                 </pattern>
-
-                <pattern id="balcony-hatch" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                    <rect width="20" height="20" fill="var(--balcony-floor)"/>
-                    <line x1="0" y1="0" x2="0" y2="20" stroke="#d4cdc2" stroke-width="1"/>
+                <pattern id="hatch-24" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <rect width="20" height="20" fill="var(--ceil-24)"/>
+                    <line x1="0" y1="0" x2="0" y2="20" stroke="#d5cece" stroke-width="1"/>
                 </pattern>
-
                 <pattern id="concrete-pattern" width="10" height="10" patternUnits="userSpaceOnUse">
                     <rect width="10" height="10" fill="var(--wet-wall)" />
                     <circle cx="3" cy="3" r="1" fill="#a09388" />
-                    <circle cx="7" cy="7" r="1.5" fill="#5c5046" />
                 </pattern>
+
+                <!-- Light Symbols -->
+                <g id="sym-recessed"><circle cx="0" cy="0" r="8" fill="#fff" stroke="#e67e22" stroke-width="2"/><circle cx="0" cy="0" r="4" fill="#e67e22"/></g>
+                <g id="sym-ceiling"><circle cx="0" cy="0" r="25" fill="rgba(52, 152, 219, 0.1)" stroke="#3498db" stroke-width="2"/><circle cx="0" cy="0" r="4" fill="#3498db"/></g>
             </defs>
 
-            <!-- ================= 背景與區域劃分 ================= -->
-            <!-- 陽台區 (0.94m 寬) -->
-            <polygon points="0,40 40,0 94,0 94,400 40,400 0,360" fill="url(#balcony-hatch)" />
-            
-            <!-- 主臥室 (3m 寬) -->
-            <rect x="94" y="0" width="300" height="400" fill="url(#wood-floor)" />
-            
-            <!-- 客餐廳 (4.86m 寬) -->
-            <rect x="394" y="0" width="486" height="400" fill="url(#wood-floor)" />
-            
-            <!-- 衛浴 (2.3m寬 x 1.5m深) -->
-            <rect x="880" y="0" width="230" height="150" fill="url(#tile-floor)" />
+            <!-- ================= 固定底層 (Base Layer) ================= -->
+            <g id="layer-base">
+                <!-- 地板 -->
+                <polygon points="0,40 40,0 94,0 94,400 40,400 0,360" fill="#e3ddd5" />
+                <rect x="94" y="0" width="786" height="400" fill="url(#wood-floor)" />
+                <rect x="880" y="0" width="230" height="400" fill="url(#tile-floor)" />
 
-            <!-- 廚房與玄關 (2.3m寬 x 2.35m深，扣除15cm共用水牆) -->
-            <rect x="880" y="165" width="230" height="235" fill="url(#tile-floor)" />
+                <!-- 外部尺寸線 (永遠顯示) -->
+                <g stroke="#b0a092" stroke-width="2">
+                    <line x1="94" y1="-30" x2="394" y2="-30" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+                    <text x="244" y="-45" class="dim-text" stroke="none">3m</text>
+                    <line x1="394" y1="-30" x2="880" y2="-30" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+                    <text x="637" y="-45" class="dim-text" stroke="none">4.86m</text>
+                    <line x1="880" y1="-30" x2="1110" y2="-30" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+                    <text x="995" y="-45" class="dim-text" stroke="none">2.3m</text>
+                    <!-- 短線 -->
+                    <line x1="94" y1="-40" x2="94" y2="-20" stroke-width="1"/><line x1="394" y1="-40" x2="394" y2="-20" stroke-width="1"/><line x1="880" y1="-40" x2="880" y2="-20" stroke-width="1"/><line x1="1110" y1="-40" x2="1110" y2="-20" stroke-width="1"/>
 
-            <!-- 空間浮水印 -->
-            <text x="244" y="200" class="room-title">主臥室</text>
-            <text x="637" y="200" class="room-title">客餐廳</text>
-
-
-            <!-- ================= 隱藏式機電天花板 (MEP Overlay) ================= -->
-            <!-- H=2.6m 木作假樑 (藏全室管線) -->
-            <g opacity="0.3">
-                <rect x="94" y="0" width="784" height="40" fill="var(--mep-beam)" stroke="#d35400" stroke-width="2" stroke-dasharray="5,5" />
-                <rect x="354" y="40" width="40" height="110" fill="var(--mep-beam)" stroke="#d35400" stroke-width="2" stroke-dasharray="5,5" />
-            </g>
-            <text x="244" y="20" class="mep-label">H=2.6m 木作假樑 (藏冷熱水/冷媒/新風管)</text>
-            <text x="374" y="95" class="mep-label" transform="rotate(90, 374, 95)">假樑延伸</text>
-
-
-            <!-- ================= 建築牆體結構 ================= -->
-            
-            <g fill="var(--wall-color)">
-                <!-- 左側陽台分隔牆 -->
-                <rect x="90" y="0" width="4" height="400" />
-                <!-- 主臥與客廳虛線分隔 -->
-                <line x1="394" y1="0" x2="394" y2="400" stroke="var(--wall-color)" stroke-width="3" stroke-dasharray="10,10" />
-                <!-- 客廳與衛廚分隔牆 (左牆) -->
-                <rect x="878" y="0" width="4" height="80" /> <!-- 預留衛浴門洞 80~150 -->
-                <rect x="878" y="150" width="4" height="250" />
-                <!-- 建築外圍主牆 -->
-                <rect x="94" y="-4" width="1020" height="4" />
-                <rect x="94" y="400" width="926" height="4" /> <!-- 預留大門 1020~1110 -->
-                <rect x="1110" y="0" width="4" height="310" /> <!-- 預留大門開門空間 -->
-            </g>
-
-            <!-- 🌟 重點：15cm 廚衛共用水牆 (Wet Wall) -->
-            <!-- 位於 y=150 到 y=165，長度 x=882 到 x=1110 -->
-            <rect x="882" y="150" width="228" height="15" fill="url(#concrete-pattern)" stroke="var(--wall-color)" stroke-width="1.5" />
-            <text x="996" y="158" class="furn-label" style="font-size: 10px; fill: #fff; letter-spacing: 2px;">15cm 共用水牆 (內藏排水與給水管)</text>
-
-
-            <!-- ================= 家具與重點設備 (1:1 實體化) ================= -->
-            
-            <!-- 【陽台區】 -->
-            <!-- 洗衣機 -->
-            <rect x="15" y="280" width="65" height="70" fill="#f0ebe6" stroke="#c4bdb6" stroke-width="2" rx="4" />
-            <circle cx="47.5" cy="315" r="20" fill="#d4cec8" />
-            <text x="47.5" y="365" class="small-label" style="font-size:11px;">洗衣機</text>
-            
-            <!-- 新風機主機 (天花板吊掛示意) -->
-            <rect x="15" y="20" width="60" height="40" fill="none" stroke="var(--mep-fresh)" stroke-width="2" stroke-dasharray="4,2" rx="3" />
-            <text x="45" y="40" class="mep-label" style="fill: var(--mep-fresh);" transform="rotate(90, 45, 40)">新風機</text>
-            
-            <!-- 冷氣室外機 (上下疊放示意) -->
-            <rect x="15" y="190" width="60" height="70" fill="none" stroke="var(--mep-ac)" stroke-width="2" stroke-dasharray="4,2" rx="3" />
-            <text x="45" y="225" class="mep-label" style="fill: var(--mep-ac);" transform="rotate(90, 45, 225)">疊放室外機</text>
-
-
-            <!-- 【主臥室】 -->
-            <!-- 1對1冷氣室內機 -->
-            <rect x="180" y="0" width="90" height="20" fill="none" stroke="var(--mep-ac)" stroke-width="2" rx="2" />
-            <text x="225" y="10" class="mep-label" style="fill: var(--mep-ac);">主臥冷氣</text>
-
-            <!-- 化妝台 -->
-            <rect x="94" y="0" width="60" height="45" fill="var(--furn-wood)" />
-            <circle cx="124" cy="65" r="15" fill="var(--furn-wood-dark)" />
-            <text x="124" y="22" class="small-label" fill="#fff">化妝台</text>
-
-            <!-- Queen Size 床組 (160x200cm) + 上櫃 (160x45cm) -->
-            <rect x="154" y="0" width="160" height="45" fill="var(--furn-wood-dark)" />
-            <line x1="154" y1="0" x2="314" y2="45" stroke="#bda38b" stroke-width="1" />
-            <line x1="314" y1="0" x2="154" y2="45" stroke="#bda38b" stroke-width="1" />
-            <text x="234" y="22" class="furn-label">床頭上櫃</text>
-
-            <rect x="154" y="45" width="160" height="200" fill="#ede2d5" rx="4" />
-            <rect x="154" y="80" width="160" height="165" fill="var(--furn-bed)" rx="4" />
-            <path d="M 154 90 Q 234 110 314 90" fill="none" stroke="#e3d6c8" stroke-width="2" />
-            <rect x="170" y="55" width="55" height="32" fill="#ffffff" rx="5" />
-            <rect x="245" y="55" width="55" height="32" fill="#ffffff" rx="5" />
-            <text x="234" y="150" class="furn-label-dark" style="opacity: 0.4;">Queen Size 雙人床</text>
-
-            <!-- 系統衣櫃 -->
-            <rect x="94" y="330" width="290" height="70" fill="var(--furn-wardrobe)" />
-            <rect x="100" y="335" width="135" height="60" fill="none" stroke="#f4ede6" stroke-width="2" />
-            <rect x="240" y="335" width="135" height="60" fill="none" stroke="#f4ede6" stroke-width="2" />
-            <text x="239" y="365" class="furn-label">系統衣櫃</text>
-
-
-            <!-- 【客餐廳】 -->
-            <!-- 大噸數冷氣室內機 (隔間牆上) -->
-            <rect x="364" y="50" width="20" height="100" fill="none" stroke="var(--mep-ac)" stroke-width="2" rx="2" />
-            <text x="374" y="100" class="mep-label" style="fill: var(--mep-ac);" transform="rotate(90, 374, 100)">客廳冷氣</text>
-
-            <!-- 沙發背櫃 -->
-            <rect x="405" y="0" width="225" height="30" fill="var(--furn-wood-dark)" />
-            <text x="517" y="15" class="furn-label">沙發背櫃</text>
-
-            <!-- IKEA KIVIK 沙發床 (225x90cm) -->
-            <rect x="405" y="30" width="225" height="144" fill="none" stroke="var(--furn-sofa)" stroke-width="2" stroke-dasharray="8,5" opacity="0.8" />
-            <rect x="405" y="30" width="225" height="90" fill="var(--furn-sofa)" rx="5" />
-            <rect x="405" y="30" width="225" height="15" fill="#b8b0a6" rx="5" />
-            <rect x="405" y="45" width="20" height="75" fill="#c2b9af" rx="3" />
-            <rect x="610" y="45" width="20" height="75" fill="#c2b9af" rx="3" />
-            <line x1="473" y1="45" x2="473" y2="120" stroke="#b8b0a6" stroke-width="2" />
-            <line x1="541" y1="45" x2="541" y2="120" stroke="#b8b0a6" stroke-width="2" />
-            <text x="517" y="155" class="furn-label-dark" style="opacity: 0.5;">KIVIK 展開範圍</text>
-
-            <!-- 極簡茶几 -->
-            <circle cx="517" cy="205" r="28" fill="#fcfaf7" stroke="#e0d5c8" stroke-width="2" />
-
-            <!-- IKEA NORDEN 半折疊桌 (89x80cm) -->
-            <g transform="translate(670, 20)">
-                <rect x="0" y="0" width="63" height="80" fill="var(--furn-wood-light)" />
-                <line x1="63" y1="0" x2="63" y2="80" stroke="#d4c6b5" stroke-width="1.5" />
-                <rect x="63" y="0" width="26" height="80" fill="var(--furn-wood)" />
-                <line x1="89" y1="0" x2="89" y2="80" stroke="#bda38b" stroke-width="2" />
-                <text x="44" y="40" class="furn-label-dark" style="font-size: 11px;">NORDEN桌</text>
-            </g>
-            <!-- 餐椅 -->
-            <rect x="630" y="42" width="30" height="35" fill="var(--furn-sofa)" rx="5" />
-            <rect x="770" y="42" width="30" height="35" fill="var(--furn-sofa)" rx="5" />
-
-            <!-- 下方收納列 -->
-            <rect x="400" y="360" width="45" height="40" fill="var(--furn-wood)" />
-            <text x="422" y="380" class="furn-label" style="font-size:12px;">書櫃</text>
-
-            <rect x="445" y="360" width="180" height="40" fill="var(--furn-wood)" />
-            <line x1="505" y1="360" x2="505" y2="400" stroke="#bda38b" stroke-width="1" />
-            <line x1="565" y1="360" x2="565" y2="400" stroke="#bda38b" stroke-width="1" />
-            <text x="535" y="340" class="furn-label-dark">電視櫃 (對齊沙發)</text>
-
-            <rect x="820" y="340" width="60" height="60" fill="#edeae5" stroke="#c4bdb6" />
-            <text x="850" y="370" class="small-label">冰箱 REF</text>
-
-
-            <!-- 【衛浴空間 (上方 2.3m x 1.5m)】 -->
-            <!-- 100cm 半高矮牆隔斷 -->
-            <rect x="1030" y="0" width="80" height="150" fill="#f0f3f5" />
-            <rect x="1024" y="0" width="12" height="100" fill="#f0ebe4" stroke="#c4bdb6" stroke-width="2" rx="2" />
-            <text x="1030" y="50" class="tiny-label" fill="#8c7f75" transform="rotate(90, 1030, 50)" style="letter-spacing: 2px;">半高矮牆</text>
-            <circle cx="1070" cy="75" r="12" stroke="#bbb" fill="none" />
-            <circle cx="1070" cy="75" r="2" fill="#bbb" />
-
-            <!-- 馬桶與洗手台 (靠左牆) -->
-            <rect x="890" y="0" width="30" height="15" fill="var(--furn-bath)" stroke="#dcd6d0" rx="3" />
-            <ellipse cx="905" cy="30" rx="15" ry="22" fill="var(--furn-bath)" stroke="#dcd6d0" />
-            <text x="905" y="65" class="small-label">馬桶</text>
-
-            <rect x="940" y="0" width="70" height="50" fill="#fcfaf7" stroke="#e0d7cd"/>
-            <ellipse cx="975" cy="25" rx="20" ry="12" fill="var(--furn-bath)" stroke="#dcd6d0" />
-            <circle cx="975" cy="10" r="3" fill="#a89d93" />
-            <text x="975" y="65" class="small-label">洗手台</text>
-
-
-            <!-- 【廚房與玄關 (下方 2.3m x 2.35m)】 -->
-            <!-- 廚房流理台 (緊貼 15cm 共用水牆) -->
-            <rect x="940" y="165" width="170" height="60" fill="var(--furn-kitchen)" />
-            <!-- 水槽 -->
-            <rect x="950" y="170" width="70" height="50" fill="#f5f2ed" rx="3" />
-            <rect x="955" y="175" width="30" height="40" fill="#e8e5e0" rx="2" />
-            <rect x="985" y="175" width="30" height="40" fill="#dfdbd5" rx="2" />
-            <text x="985" y="240" class="small-label">雙口水槽</text>
-            <!-- 瓦斯爐/IH爐 -->
-            <rect x="1040" y="170" width="60" height="50" fill="#fcfaf7" rx="2" />
-            <circle cx="1055" cy="195" r="10" fill="none" stroke="#a89d93" stroke-width="2" />
-            <circle cx="1085" cy="195" r="10" fill="none" stroke="#a89d93" stroke-width="2" />
-            <text x="1070" y="240" class="small-label">IH爐</text>
-
-            <!-- 玄關收納 -->
-            <rect x="880" y="360" width="70" height="40" fill="var(--furn-wood-dark)" />
-            <text x="915" y="380" class="furn-label" style="font-size:12px;">家電櫃</text>
-            <rect x="950" y="360" width="70" height="40" fill="var(--furn-wood)" />
-            <text x="985" y="372" class="tiny-label">鞋櫃(下)</text>
-            <text x="985" y="388" class="tiny-label">掛衣桿(上)</text>
-
-
-            <!-- ================= 門片與開門軌跡 ================= -->
-            <g fill="none" stroke="#bea99a" stroke-width="2">
-                <!-- 衛浴門 (開在左牆靠下，往內推平貼南牆) -->
-                <path d="M 880 80 A 70 70 0 0 1 950 150" stroke-dasharray="5,5" />
-                <line x1="880" y1="150" x2="950" y2="150" stroke-width="4" stroke-linecap="round" />
-
-                <!-- 大門入口 (鉸鏈在 1110, y=400，向內往上推) -->
-                <path d="M 1020 400 A 90 90 0 0 1 1110 310" stroke-dasharray="5,5" />
-                <line x1="1110" y1="400" x2="1110" y2="310" stroke-width="4" stroke-linecap="round" />
-                <text x="1065" y="370" class="small-label" style="opacity: 0.5;">大門動線</text>
+                    <!-- 底部總長 -->
+                    <line x1="94" y1="440" x2="1110" y2="440" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+                    <text x="602" y="465" class="dim-text" stroke="none">室內總長 10.16m</text>
+                    <line x1="94" y1="430" x2="94" y2="450" stroke-width="1"/><line x1="1110" y1="430" x2="1110" y2="450" stroke-width="1"/>
+                </g>
             </g>
 
 
-            <!-- ================= 外部精準尺寸標註 ================= -->
-            <g stroke="var(--dim-line)" stroke-width="2">
-                <!-- 頂部尺寸線 -->
-                <line x1="94" y1="-30" x2="394" y2="-30" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
-                <text x="244" y="-45" class="dim-text" stroke="none">3m (主臥)</text>
+            <!-- ================= ① 泥作與結構層 (Masonry) ================= -->
+            <g id="layer-masonry">
+                <!-- 建築主牆 -->
+                <g fill="var(--wall-color)">
+                    <rect x="90" y="0" width="4" height="400" />
+                    <line x1="394" y1="0" x2="394" y2="400" stroke="var(--wall-color)" stroke-width="3" stroke-dasharray="10,10" />
+                    <rect x="878" y="0" width="4" height="80" /> <!-- 預留浴室門 -->
+                    <rect x="878" y="150" width="4" height="250" />
+                    <rect x="94" y="-4" width="1020" height="4" />
+                    <rect x="94" y="400" width="926" height="4" />
+                    <rect x="1110" y="0" width="4" height="310" />
+                </g>
+
+                <!-- 共用水牆 Wet Wall -->
+                <rect x="882" y="150" width="228" height="15" fill="url(#concrete-pattern)" stroke="var(--wall-color)" stroke-width="1.5" />
+                <text x="996" y="158" class="furn-label" style="font-size: 10px; fill: #fff; letter-spacing: 2px;">15cm 共用水牆</text>
+
+                <!-- 衛浴半高矮牆 -->
+                <rect x="1030" y="0" width="80" height="150" fill="rgba(240, 243, 245, 0.5)" />
+                <rect x="1024" y="0" width="12" height="100" fill="#f0ebe4" stroke="#c4bdb6" stroke-width="2" rx="2" />
+                <text x="1030" y="50" class="furn-label-dark" style="font-size: 10px;" transform="rotate(90, 1030, 50)">半高矮牆</text>
+
+                <!-- 門片軌跡 -->
+                <g fill="none" stroke="#bea99a" stroke-width="2">
+                    <path d="M 880 80 A 70 70 0 0 1 950 150" stroke-dasharray="5,5" />
+                    <line x1="880" y1="150" x2="950" y2="150" stroke-width="4" stroke-linecap="round" />
+                    <path d="M 1020 400 A 90 90 0 0 1 1110 310" stroke-dasharray="5,5" />
+                    <line x1="1110" y1="400" x2="1110" y2="310" stroke-width="4" stroke-linecap="round" />
+                </g>
+            </g>
+
+
+            <!-- ================= ② 水電與空調層 (MEP Layer) ================= -->
+            <g id="layer-mep">
+                <!-- 管道間 -->
+                <rect x="1060" y="0" width="50" height="40" fill="#636e72" />
+                <text x="1085" y="20" class="furn-label">管道間</text>
+
+                <!-- 水管管線 -->
+                <g class="pipe-line">
+                    <!-- 糞管/排水 -->
+                    <path d="M 905 30 L 1060 30" stroke="var(--pipe-drain)" stroke-width="5" fill="none" marker-end="url(#arrow-drain)" />
+                    <path d="M 920 180 L 1080 180 L 1080 40" stroke="var(--pipe-drain)" stroke-width="4" fill="none" marker-end="url(#arrow-drain)" />
+                    <!-- 熱水 -->
+                    <path d="M 50 25 L 910 25 L 910 180" stroke="var(--pipe-hot)" stroke-width="2" fill="none" stroke-linejoin="round" />
+                    <!-- 冷水 -->
+                    <path d="M 1000 15 L 50 15" stroke="var(--pipe-cold)" stroke-width="2" fill="none" stroke-linejoin="round" />
+                    <!-- 冷凝水 -->
+                    <path d="M 445 50 L 445 35 L 920 35 L 920 180" stroke="var(--pipe-acd)" stroke-width="3" stroke-dasharray="6,4" fill="none" />
+                </g>
+
+                <!-- 設備 -->
+                <rect x="15" y="190" width="60" height="70" fill="rgba(52, 152, 219, 0.2)" stroke="var(--mep-ac)" stroke-width="2" stroke-dasharray="4,2" rx="3" />
+                <text x="45" y="225" class="small-label" style="fill: var(--mep-ac);" transform="rotate(90, 45, 225)">疊放室外機</text>
+
+                <rect x="180" y="0" width="90" height="20" fill="rgba(52, 152, 219, 0.4)" stroke="var(--mep-ac)" stroke-width="2" rx="2" />
+                <text x="225" y="10" class="furn-label">主臥冷氣</text>
                 
-                <line x1="394" y1="-30" x2="880" y2="-30" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
-                <text x="637" y="-45" class="dim-text" stroke="none">4.86m (客廳)</text>
+                <rect x="364" y="50" width="20" height="100" fill="rgba(52, 152, 219, 0.4)" stroke="var(--mep-ac)" stroke-width="2" rx="2" />
+                <text x="374" y="100" class="furn-label" transform="rotate(90, 374, 100)">客廳冷氣</text>
+
+                <rect x="15" y="20" width="60" height="40" fill="rgba(39, 174, 96, 0.2)" stroke="var(--mep-fresh)" stroke-width="2" stroke-dasharray="4,2" rx="3" />
+                <text x="45" y="40" class="small-label" style="fill: var(--mep-fresh);" transform="rotate(90, 45, 40)">新風主機</text>
+                <path d="M 75 40 L 400 40 L 400 150" stroke="var(--mep-fresh)" stroke-width="5" fill="none" opacity="0.6" />
+            </g>
+
+
+            <!-- ================= ③ 天花板與照明層 (Ceiling) ================= -->
+            <g id="layer-ceiling">
+                <!-- 高度分區色塊 -->
+                <rect x="94" y="0" width="786" height="400" fill="var(--ceil-28)" stroke="#e0e0e0" stroke-width="1" class="ceil-zone" opacity="0.8"/>
+                <rect x="880" y="0" width="230" height="400" fill="url(#hatch-24)" stroke="#b8b0a6" stroke-width="2" class="ceil-zone" opacity="0.8"/>
                 
-                <line x1="880" y1="-30" x2="1110" y2="-30" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
-                <text x="995" y="-45" class="dim-text" stroke="none">2.3m (衛廚)</text>
+                <rect x="94" y="0" width="786" height="50" fill="var(--ceil-26)" stroke="#cbbab5" stroke-width="2" class="ceil-zone" opacity="0.9"/>
+                <rect x="364" y="50" width="60" height="100" fill="var(--ceil-26)" stroke="#cbbab5" stroke-width="2" class="ceil-zone" opacity="0.9"/>
+                
+                <!-- 文字標示 -->
+                <text x="995" y="200" class="furn-label-dark" style="opacity: 0.7;">H=2.4m 平釘區</text>
+                <text x="420" y="25" class="furn-label-dark" style="opacity: 0.7;">H=2.6m 局部包管假樑區</text>
+                
+                <!-- 照明燈具 -->
+                <use href="#sym-ceiling" x="244" y="210" /> <!-- 主臥主燈 -->
+                <use href="#sym-ceiling" x="517" y="205" /> <!-- 客廳主燈 -->
+                <use href="#sym-recessed" x="930" y="40" /> <use href="#sym-recessed" x="990" y="40" />
+                <use href="#sym-recessed" x="980" y="200" /> <use href="#sym-recessed" x="1050" y="200" />
+                <use href="#sym-recessed" x="980" y="280" /> <use href="#sym-recessed" x="1050" y="280" />
+                
+                <!-- LED 間接照明 -->
+                <path d="M 94 55 L 360 55 L 360 155" fill="none" stroke="#f1c40f" stroke-width="4" stroke-dasharray="6,4" />
+                <path d="M 428 55 L 880 55" fill="none" stroke="#f1c40f" stroke-width="4" stroke-dasharray="6,4" />
+            </g>
 
-                <!-- 頂部輔助短線 -->
-                <line x1="94" y1="-40" x2="94" y2="-20" stroke-width="1"/>
-                <line x1="394" y1="-40" x2="394" y2="-20" stroke-width="1"/>
-                <line x1="880" y1="-40" x2="880" y2="-20" stroke-width="1"/>
-                <line x1="1110" y1="-40" x2="1110" y2="-20" stroke-width="1"/>
 
-                <!-- 右側尺寸線 (精確扣除牆厚) -->
-                <line x1="1140" y1="0" x2="1140" y2="150" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
-                <text x="1185" y="75" class="dim-text" stroke="none">1.5m</text>
+            <!-- ================= ④ 系統櫃與設備層 (Cabinetry) ================= -->
+            <g id="layer-cabinetry">
+                <!-- 衛浴設備 -->
+                <rect x="890" y="0" width="30" height="15" fill="#fff" stroke="#ccc" rx="3" />
+                <ellipse cx="905" cy="30" rx="15" ry="22" fill="#fff" stroke="#ccc" />
+                <rect x="940" y="0" width="70" height="50" fill="#fcfaf7" stroke="#ccc"/>
+                <ellipse cx="975" cy="25" rx="20" ry="12" fill="#fff" stroke="#ccc" />
+                <circle cx="1070" cy="75" r="12" stroke="#bbb" fill="none" /><circle cx="1070" cy="75" r="2" fill="#bbb" />
 
-                <line x1="1140" y1="150" x2="1140" y2="165" />
-                <text x="1185" y="157.5" class="small-label" stroke="none">15cm 牆</text>
+                <!-- 廚房流理台 -->
+                <rect x="940" y="165" width="170" height="60" fill="var(--furn-kitchen)" />
+                <rect x="950" y="170" width="70" height="50" fill="#f5f2ed" rx="3" />
+                <rect x="955" y="175" width="30" height="40" fill="#e8e5e0" rx="2" />
+                <rect x="985" y="175" width="30" height="40" fill="#dfdbd5" rx="2" />
+                <rect x="1040" y="170" width="60" height="50" fill="#fcfaf7" rx="2" />
+                <circle cx="1055" cy="195" r="10" fill="none" stroke="#aaa" stroke-width="2" />
+                <circle cx="1085" cy="195" r="10" fill="none" stroke="#aaa" stroke-width="2" />
 
-                <line x1="1140" y1="165" x2="1140" y2="400" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
-                <text x="1185" y="282.5" class="dim-text" stroke="none">2.35m</text>
+                <!-- 收納櫃體 -->
+                <rect x="154" y="0" width="160" height="45" fill="var(--furn-wood-dark)" />
+                <line x1="154" y1="0" x2="314" y2="45" stroke="#bda38b" stroke-width="1" />
+                <line x1="314" y1="0" x2="154" y2="45" stroke="#bda38b" stroke-width="1" />
+                <text x="234" y="22" class="furn-label">床頭上櫃</text>
 
-                <!-- 右側輔助短線 -->
-                <line x1="1130" y1="0" x2="1150" y2="0" stroke-width="1"/>
-                <line x1="1130" y1="150" x2="1150" y2="150" stroke-width="1"/>
-                <line x1="1130" y1="165" x2="1150" y2="165" stroke-width="1"/>
-                <line x1="1130" y1="400" x2="1150" y2="400" stroke-width="1"/>
+                <rect x="94" y="330" width="290" height="70" fill="var(--furn-wardrobe)" />
+                <rect x="100" y="335" width="135" height="60" fill="none" stroke="#fff" stroke-width="2" />
+                <rect x="240" y="335" width="135" height="60" fill="none" stroke="#fff" stroke-width="2" />
+                <text x="239" y="365" class="furn-label">系統大衣櫃</text>
 
-                <!-- 底部尺寸線 -->
-                <line x1="0" y1="440" x2="94" y2="440" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
-                <text x="47" y="465" class="dim-text" stroke="none">0.94m</text>
+                <rect x="405" y="0" width="225" height="30" fill="var(--furn-wood-dark)" />
+                <text x="517" y="15" class="furn-label">沙發背櫃</text>
 
-                <line x1="94" y1="440" x2="1110" y2="440" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
-                <text x="602" y="465" class="dim-text" stroke="none">室內總長 10.16m</text>
+                <rect x="445" y="360" width="180" height="40" fill="var(--furn-wood)" />
+                <line x1="505" y1="360" x2="505" y2="400" stroke="#bda38b" stroke-width="1" />
+                <line x1="565" y1="360" x2="565" y2="400" stroke="#bda38b" stroke-width="1" />
+                <text x="535" y="340" class="furn-label-dark">電視長櫃</text>
 
-                <!-- 底部輔助短線 -->
-                <line x1="0" y1="430" x2="0" y2="450" stroke-width="1"/>
-                <line x1="94" y1="430" x2="94" y2="450" stroke-width="1"/>
-                <line x1="1110" y1="430" x2="1110" y2="450" stroke-width="1"/>
+                <rect x="400" y="360" width="45" height="40" fill="var(--furn-wood)" />
+                <text x="422" y="380" class="small-label">書櫃</text>
+
+                <rect x="880" y="360" width="70" height="40" fill="var(--furn-wood-dark)" />
+                <text x="915" y="380" class="furn-label" style="font-size:12px;">家電櫃</text>
+                
+                <rect x="950" y="360" width="70" height="40" fill="var(--furn-wood)" />
+                <text x="985" y="380" class="small-label">鞋櫃</text>
+            </g>
+
+
+            <!-- ================= ⑤ 軟裝與家具層 (Furniture) ================= -->
+            <g id="layer-furniture">
+                <!-- 化妝台 -->
+                <rect x="94" y="0" width="60" height="45" fill="none" />
+                <circle cx="124" cy="65" r="15" fill="var(--furn-wood-dark)" />
+                <text x="124" y="22" class="small-label" fill="#fff">化妝台</text>
+
+                <!-- 床 -->
+                <rect x="154" y="45" width="160" height="200" fill="#ede2d5" rx="4" />
+                <rect x="154" y="80" width="160" height="165" fill="var(--furn-bed)" rx="4" />
+                <path d="M 154 90 Q 234 110 314 90" fill="none" stroke="#e3d6c8" stroke-width="2" />
+                <rect x="170" y="55" width="55" height="32" fill="#ffffff" rx="5" />
+                <rect x="245" y="55" width="55" height="32" fill="#ffffff" rx="5" />
+                <text x="234" y="150" class="furn-label-dark" style="opacity: 0.5;">Queen Bed</text>
+
+                <!-- 沙發床 KIVIK -->
+                <rect x="405" y="30" width="225" height="144" fill="none" stroke="var(--furn-sofa)" stroke-width="2" stroke-dasharray="8,5" />
+                <rect x="405" y="30" width="225" height="90" fill="var(--furn-sofa)" rx="5" />
+                <rect x="405" y="30" width="225" height="15" fill="#b8b0a6" rx="5" />
+                <rect x="405" y="45" width="20" height="75" fill="#c2b9af" rx="3" />
+                <rect x="610" y="45" width="20" height="75" fill="#c2b9af" rx="3" />
+                <line x1="473" y1="45" x2="473" y2="120" stroke="#b8b0a6" stroke-width="2" />
+                <line x1="541" y1="45" x2="541" y2="120" stroke="#b8b0a6" stroke-width="2" />
+                
+                <!-- 茶几 -->
+                <circle cx="517" cy="205" r="28" fill="#fcfaf7" stroke="#e0d5c8" stroke-width="2" />
+
+                <!-- 折疊桌 NORDEN -->
+                <g transform="translate(670, 20)">
+                    <rect x="0" y="0" width="63" height="80" fill="var(--furn-wood-light)" />
+                    <line x1="63" y1="0" x2="63" y2="80" stroke="#d4c6b5" stroke-width="1.5" />
+                    <rect x="63" y="0" width="26" height="80" fill="var(--furn-wood)" />
+                    <text x="44" y="40" class="furn-label-dark" style="font-size: 11px;">NORDEN</text>
+                </g>
+                <rect x="630" y="42" width="30" height="35" fill="var(--furn-sofa)" rx="5" />
+                <rect x="770" y="42" width="30" height="35" fill="var(--furn-sofa)" rx="5" />
+
+                <!-- 家電 -->
+                <rect x="15" y="280" width="65" height="70" fill="#f0ebe6" stroke="#ccc" rx="4" />
+                <circle cx="47.5" cy="315" r="20" fill="#d4cec8" />
+                <rect x="820" y="340" width="60" height="60" fill="#edeae5" stroke="#ccc" />
+                <text x="850" y="370" class="small-label">REF.</text>
             </g>
 
         </svg>
     </div>
 
+    <!-- JavaScript Logic -->
+    <script>
+        // Define Legends for each layer
+        const legends = {
+            masonry: `
+                <div class="legend-item"><div class="legend-box" style="background: var(--wall-color);"></div>建築主牆 / 隔間</div>
+                <div class="legend-item"><div class="legend-box" style="background: var(--wet-wall);"></div>15cm 共用水牆 (Wet Wall)</div>
+                <div class="legend-item"><div class="legend-box" style="background: #f0ebe4; border-color: #c4bdb6"></div>衛浴半高矮牆</div>
+            `,
+            mep: `
+                <div class="legend-item"><div class="legend-line" style="background: var(--pipe-cold);"></div>冷水管</div>
+                <div class="legend-item"><div class="legend-line" style="background: var(--pipe-hot);"></div>熱水管</div>
+                <div class="legend-item"><div class="legend-line" style="background: var(--pipe-drain);"></div>廢水/糞管</div>
+                <div class="legend-item"><div class="legend-box" style="border: 2px dashed var(--mep-ac);"></div>冷氣設備</div>
+                <div class="legend-item"><div class="legend-box" style="border: 2px dashed var(--mep-fresh);"></div>正壓新風主機</div>
+            `,
+            ceiling: `
+                <div class="legend-item"><div class="legend-box" style="background: var(--ceil-28);"></div>H=2.8m (保留最高屋頂)</div>
+                <div class="legend-item"><div class="legend-box" style="background: var(--ceil-26);"></div>H=2.6m (木作假樑包管)</div>
+                <div class="legend-item"><div class="legend-box" style="background: var(--ceil-24);"></div>H=2.4m (平釘天花板)</div>
+                <div class="legend-item">
+                    <svg class="legend-icon"><circle cx="10" cy="10" r="6" fill="none" stroke="#3498db" stroke-width="2"/><circle cx="10" cy="10" r="2" fill="#3498db"/></svg> 吸頂主燈
+                </div>
+                <div class="legend-item">
+                    <svg class="legend-icon"><circle cx="10" cy="10" r="5" fill="#e67e22"/></svg> 嵌燈
+                </div>
+            `,
+            cabinetry: `
+                <div class="legend-item"><div class="legend-box" style="background: var(--furn-wood-dark);"></div>系統櫃/木作櫃體</div>
+                <div class="legend-item"><div class="legend-box" style="background: var(--furn-wardrobe);"></div>系統大衣櫃</div>
+                <div class="legend-item"><div class="legend-box" style="background: var(--furn-kitchen);"></div>廚房流理台設備</div>
+                <div class="legend-item"><div class="legend-box" style="background: #fff;"></div>衛浴陶瓷設備</div>
+            `,
+            furniture: `
+                <div class="legend-item"><div class="legend-box" style="background: var(--furn-sofa);"></div>沙發 / 軟裝椅</div>
+                <div class="legend-item"><div class="legend-box" style="background: var(--furn-bed);"></div>床墊寢具</div>
+                <div class="legend-item"><div class="legend-box" style="background: var(--furn-wood-light);"></div>活動式家具 (折疊桌/茶几)</div>
+                <div class="legend-item"><div class="legend-box" style="background: #edeae5;"></div>活動家電 (冰箱/洗衣機)</div>
+            `,
+            all: `
+                <div class="legend-item"><div class="legend-box" style="background: url('data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'10\\' height=\\'10\\'><rect width=\\'10\\' height=\\'10\\' fill=\\'%238c7f75\\' /><circle cx=\\'3\\' cy=\\'3\\' r=\\'1\\' fill=\\'%23a09388\\' /></svg>');"></div>15cm 共用水牆</div>
+                <div class="legend-item"><div class="legend-box" style="background: rgba(241, 196, 15, 0.3); border: 1px dashed #d35400;"></div>H=2.6m 天花板假樑 (藏管線)</div>
+                <div class="legend-item"><div class="legend-box" style="border: 2px dashed #3498db;"></div>空調設備</div>
+                <div class="legend-item"><div class="legend-box" style="background: #cfc7bd;"></div>實體化家具 (KIVIK/NORDEN)</div>
+            `
+        };
+
+        const layers = ['masonry', 'mep', 'ceiling', 'cabinetry', 'furniture'];
+        const svgElement = document.getElementById('master-svg');
+        const legendContainer = document.getElementById('legend');
+
+        // Initialize with 'all'
+        updateLegend('all');
+
+        // Handle Tab Clicks
+        document.getElementById('tabs').addEventListener('click', function(e) {
+            if(e.target.classList.contains('tab-btn')) {
+                // Update active tab styling
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+
+                const selectedLayer = e.target.getAttribute('data-layer');
+
+                // Update SVG layer visibility
+                if(selectedLayer === 'all') {
+                    svgElement.classList.add('mode-all');
+                    layers.forEach(layer => {
+                        document.getElementById('layer-' + layer).style.opacity = '1';
+                        document.getElementById('layer-' + layer).style.display = 'inline';
+                    });
+                } else {
+                    svgElement.classList.remove('mode-all');
+                    layers.forEach(layer => {
+                        const el = document.getElementById('layer-' + layer);
+                        if(layer === selectedLayer) {
+                            el.style.display = 'inline';
+                            setTimeout(() => el.style.opacity = '1', 50); // slight delay for fade in
+                        } else {
+                            el.style.opacity = '0';
+                            setTimeout(() => el.style.display = 'none', 300); // hide after fade out
+                        }
+                    });
+                }
+
+                // Update Legend
+                updateLegend(selectedLayer);
+            }
+        });
+
+        function updateLegend(mode) {
+            legendContainer.style.opacity = '0';
+            setTimeout(() => {
+                legendContainer.innerHTML = legends[mode];
+                legendContainer.style.opacity = '1';
+            }, 200);
+        }
+    </script>
 </body>
 </html>
 

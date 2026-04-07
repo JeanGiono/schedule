@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>北歐奶茶風 - 互動式分層施工圖</title>
+    <title>北歐奶茶風 - 互動式分層施工圖 (插座升級版)</title>
     <style>
         :root {
             /* 空間與材質色彩 */
@@ -167,7 +167,7 @@
 
     <div class="header">
         <h1>北歐奶茶風 互動式分層施工圖</h1>
-        <p>終極純淨版：無白邊、軌道化全指引線排列、保證100%零重疊</p>
+        <p>升級配置：已納入沙發/餐桌雙側插座與智慧窗簾電源，保證100%零重疊</p>
     </div>
 
     <!-- Tabs -->
@@ -264,7 +264,7 @@
                     <line x1="1110" y1="400" x2="1110" y2="310" stroke-width="4" stroke-linecap="round" />
                 </g>
 
-                <!-- 文字標示 (右側軌道 Y=120, 50) -->
+                <!-- 泥作文字標示 -->
                 <polyline points="996,157 1130,120 1150,120" class="leader-line"/>
                 <text x="1160" y="120" class="label-text" fill="#5c5046" text-anchor="start">15cm 共用水牆</text>
 
@@ -275,6 +275,11 @@
             <!-- ================= ② 水電與空調層 ================= -->
             <g id="layer-mep">
                 <rect x="1060" y="0" width="50" height="40" fill="#636e72" />
+                
+                <!-- 管道標示 -->
+                <polyline points="1085,20 1130,15 1150,15" class="leader-line"/>
+                <text x="1160" y="15" class="label-text" fill="#636e72" text-anchor="start">大樓管道間</text>
+
                 <g class="pipe-line">
                     <path d="M 905 30 L 1060 30" stroke="var(--pipe-drain)" stroke-width="5" fill="none" marker-end="url(#arrow-drain)" />
                     <path d="M 920 180 L 1080 180 L 1080 40" stroke="var(--pipe-drain)" stroke-width="4" fill="none" marker-end="url(#arrow-drain)" />
@@ -288,11 +293,8 @@
                 <rect x="15" y="20" width="60" height="40" fill="rgba(39, 174, 96, 0.2)" stroke="var(--mep-fresh)" stroke-width="2" stroke-dasharray="4,2" rx="3" />
                 <path d="M 75 40 L 400 40 L 400 150" stroke="var(--mep-fresh)" stroke-width="5" fill="none" opacity="0.6" />
 
-                <!-- 文字標示 -->
+                <!-- 空調文字標示 -->
                 <!-- 右側軌道 -->
-                <polyline points="1085,20 1130,15 1150,15" class="leader-line"/>
-                <text x="1160" y="15" class="label-text" fill="#636e72" text-anchor="start">大樓管道間</text>
-
                 <!-- 左側軌道 -->
                 <polyline points="15,225 -20,225" class="leader-line"/>
                 <text x="-30" y="225" class="label-text" fill="var(--mep-ac)" text-anchor="end">疊放室外機</text>
@@ -300,10 +302,10 @@
                 <text x="-30" y="-60" class="label-text" fill="var(--mep-fresh)" text-anchor="end">正壓新風主機</text>
 
                 <!-- 上方軌道 (確保線不穿透字體，Y線條停在字體下方 10px 處) -->
-                <polyline points="225,10 225,-90 230,-90" class="leader-line"/>
+                <polyline points="230,10 230,-90 230,-90" class="leader-line"/>
                 <text x="230" y="-100" class="label-text" fill="var(--mep-ac)" text-anchor="middle">主臥冷氣</text>
 
-                <polyline points="374,50 374,-100 410,-100" class="leader-line"/>
+                <polyline points="410,50 410,-100 410,-100" class="leader-line"/>
                 <text x="410" y="-110" class="label-text" fill="var(--mep-ac)" text-anchor="middle">客廳冷氣</text>
             </g>
 
@@ -322,7 +324,7 @@
                 <path d="M 94 55 L 360 55 L 360 155" fill="none" stroke="#f1c40f" stroke-width="4" stroke-dasharray="6,4" />
                 <path d="M 428 55 L 880 55" fill="none" stroke="#f1c40f" stroke-width="4" stroke-dasharray="6,4" />
 
-                <!-- 文字標示 -->
+                <!-- 天花板文字標示 -->
                 <polyline points="995,200 1130,190 1150,190" class="leader-line"/>
                 <text x="1160" y="190" class="label-text" fill="#8c7f75" text-anchor="start">H=2.4m 平釘區</text>
                 
@@ -366,10 +368,10 @@
 
                 <!-- 櫃體文字標示 -->
                 <!-- 上方軌道 -->
-                <polyline points="515,15 515,-110 560,-110" class="leader-line"/>
+                <polyline points="540,15 540,-110 560,-110" class="leader-line"/>
                 <text x="560" y="-120" class="label-text" fill="#5c5046" text-anchor="middle">沙發背櫃</text>
 
-                <!-- 下方軌道 (線條停在字體上方 10px 處) -->
+                <!-- 下方軌道 -->
                 <polyline points="200,45 200,470" class="leader-line"/>
                 <text x="200" y="480" class="label-text" fill="#5c5046" text-anchor="middle">床頭上櫃</text>
                 
@@ -500,15 +502,37 @@
                 <polyline points="280,350 280,550" class="leader-line"/>
                 <text x="280" y="560" class="label-text" fill="#d35400" text-anchor="middle">衣櫃除濕棒</text>
 
-                <!-- 【客廳與主臥 / 上方軌道】 -->
-                <use href="#sym-socket" x="420" y="60"/>
-                <polyline points="420,60 420,-70 450,-70" class="leader-line"/>
-                <text x="450" y="-80" class="label-text" fill="#d35400" text-anchor="middle">沙發 Type-C</text>
 
-                <use href="#sym-socket" x="655" y="15"/>
-                <polyline points="655,15 655,-70 660,-70" class="leader-line"/>
-                <text x="660" y="-80" class="label-text" fill="#d35400" text-anchor="middle">餐桌插座</text>
+                <!-- 【客廳與主臥 / 上方軌道 (完全錯開重疊)】 -->
+                
+                <!-- 🌟 新增：沙發兩側插座 (Type-C) -->
+                <use href="#sym-socket" x="395" y="15"/>
+                <polyline points="395,15 395,-70 395,-70" class="leader-line"/>
+                <text x="395" y="-80" class="label-text" fill="#d35400" text-anchor="middle">沙發左側 (Type-C)</text>
 
+                <use href="#sym-socket" x="635" y="15"/>
+                <polyline points="635,15 635,-70 635,-70" class="leader-line"/>
+                <text x="635" y="-80" class="label-text" fill="#d35400" text-anchor="middle">沙發右側 (Type-C)</text>
+
+                <!-- 🌟 新增：餐桌兩側插座 -->
+                <use href="#sym-socket" x="665" y="15"/>
+                <polyline points="665,15 665,-90 665,-90" class="leader-line"/>
+                <text x="665" y="-100" class="label-text" fill="#d35400" text-anchor="middle">餐桌左側插座</text>
+
+                <use href="#sym-socket" x="755" y="15"/>
+                <polyline points="755,15 755,-70 755,-70" class="leader-line"/>
+                <text x="755" y="-80" class="label-text" fill="#d35400" text-anchor="middle">餐桌右側插座</text>
+
+                <!-- 🌟 新增：智慧窗簾預留電源 (高處) -->
+                <use href="#sym-socket" x="105" y="15"/>
+                <polyline points="105,15 105,-140 110,-140" class="leader-line"/>
+                <text x="110" y="-150" class="label-text" fill="#d35400" text-anchor="middle">主臥智慧窗簾電源</text>
+
+                <use href="#sym-socket" x="410" y="15"/>
+                <polyline points="410,15 410,-130 410,-130" class="leader-line"/>
+                <text x="410" y="-140" class="label-text" fill="#d35400" text-anchor="middle">客廳智慧窗簾電源</text>
+
+                <!-- 原有主臥雙切與插座 -->
                 <use href="#sym-switch" x="170" y="20"/>
                 <use href="#sym-socket" x="185" y="20"/>
                 <polyline points="170,20 170,-70" class="leader-line"/>
@@ -520,8 +544,8 @@
                 <text x="300" y="-80" class="label-text" fill="#d35400" text-anchor="middle">雙切 + Type-C</text>
 
                 <use href="#sym-switch" x="380" y="130"/>
-                <polyline points="380,130 380,-120 365,-120" class="leader-line"/>
-                <text x="365" y="-130" class="label-text" fill="#d35400" text-anchor="middle">門口雙切</text>
+                <polyline points="380,130 380,-120 355,-120" class="leader-line"/>
+                <text x="355" y="-130" class="label-text" fill="#d35400" text-anchor="middle">門口雙切</text>
 
                 <!-- 【陽台區 / 左側軌道】 -->
                 <use href="#sym-socket" x="35" y="270"/>
@@ -577,7 +601,7 @@
                 <div class="legend-item"><div class="legend-box" style="background: url('data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'10\\' height=\\'10\\'><rect width=\\'10\\' height=\\'10\\' fill=\\'%238c7f75\\' /><circle cx=\\'3\\' cy=\\'3\\' r=\\'1\\' fill=\\'%23a09388\\' /></svg>');"></div>15cm 共用水牆</div>
                 <div class="legend-item"><div class="legend-box" style="background: rgba(241, 196, 15, 0.3); border: 1px dashed #d35400;"></div>H=2.6m 天花板假樑</div>
                 <div class="legend-item"><svg class="legend-icon"><rect x="4" y="2" width="12" height="16" fill="#fff" stroke="#c0392b" stroke-width="2"/><line x1="4" y1="2" x2="16" y2="18" stroke="#c0392b" stroke-width="1.5"/></svg> 總電箱 (配電盤)</div>
-                <div class="legend-item"><svg class="legend-icon"><line x1="2" y1="10" x2="18" y2="10" stroke="#a39486" stroke-width="1.5" stroke-dasharray="4,3"/></svg> 全區軌道化指引線 (乾淨無重疊)</div>
+                <div class="legend-item"><svg class="legend-icon"><line x1="2" y1="10" x2="18" y2="10" stroke="#a39486" stroke-width="1.5" stroke-dasharray="4,4"/></svg> 全區軌道化指引線 (保證無重疊)</div>
             `
         };
 

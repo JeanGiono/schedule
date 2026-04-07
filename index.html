@@ -4,10 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>北歐奶茶風 - 互動式分層施工圖 (扁平電熱水器升級版)</title>
+    <title>北歐奶茶風 - 互動式分層施工圖 (絕對零重疊藍圖版)</title>
     <style>
         :root {
-            /* 空間與材質色彩 */
             --bg-color: #fcfbf9;
             --wall-color: #5c5046;
             --wet-wall: #8c7f75;
@@ -15,7 +14,6 @@
             --floor-tile: #f0ebe4;
             --orig-beam: #a09388;
             
-            /* 家具與櫃體色彩 */
             --furn-wood: #e3d1be;
             --furn-wood-dark: #ccb7a1;
             --furn-sofa: #dfd5c9; 
@@ -24,7 +22,6 @@
             --tv-screen: #222222;
             --tv-frame: #111111;
 
-            /* 機電 MEP 色彩 */
             --mep-beam: #f1c40f;
             --mep-ac: #3498db;
             --mep-fresh: #27ae60;
@@ -35,21 +32,17 @@
             --color-airflow: #8e44ad;
             --color-exhaust: #c0392b;
 
-            /* ⚡ 弱電與插座色彩 */
             --elec-socket: #e74c3c;    
             --elec-switch: #f39c12;    
             --elec-network: #8e44ad;   
             --elec-water: #00cec9;     
             --elec-panel: #c0392b;     
 
-            /* 天花板色彩 */
             --ceil-28: #ffffff;
             --ceil-26: #d8c8b8;
             --ceil-24: #e3dcd5;
             
-            /* UI 顏色 */
             --primary: #8c7f75;
-            --primary-hover: #706359;
             --text-main: #332b24;
         }
 
@@ -64,105 +57,52 @@
             min-height: 100vh;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--text-main);
-        }
-
-        .header h1 {
-            margin: 0 0 5px 0;
-            font-size: 26px;
-            letter-spacing: 2px;
-        }
-
-        .tabs-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 15px;
-            width: 100%;
-            max-width: 1200px;
-        }
-
-        .tab-btn {
-            background-color: #fff;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn:hover { background-color: #f4ede6; }
-        .tab-btn.active {
-            background-color: var(--primary);
-            color: #fff;
-            box-shadow: 0 4px 10px rgba(140, 127, 117, 0.4);
-        }
+        .header { text-align: center; margin-bottom: 20px; color: var(--text-main); }
+        .header h1 { margin: 0 0 5px 0; font-size: 26px; letter-spacing: 2px; }
         
+        .tabs-container {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+            margin-bottom: 15px; width: 100%; max-width: 1200px;
+        }
+        .tab-btn {
+            background-color: #fff; color: var(--primary); border: 2px solid var(--primary);
+            padding: 8px 16px; border-radius: 30px; font-size: 14px; font-weight: bold;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .tab-btn:hover { background-color: #f4ede6; }
+        .tab-btn.active { background-color: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(140, 127, 117, 0.4); }
         .tab-btn[data-layer="electrical"] { border-color: #e74c3c; color: #e74c3c; }
         .tab-btn[data-layer="electrical"].active { background-color: #e74c3c; color: #fff; }
 
         .legend-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            background: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            max-width: 1200px;
-            min-height: 24px;
-            transition: opacity 0.3s ease;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;
+            background: white; padding: 15px 25px; border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; max-width: 1200px;
         }
-
         .legend-item { display: flex; align-items: center; font-size: 13px; font-weight: 600; color: #444; }
         .legend-box { width: 18px; height: 18px; margin-right: 8px; border-radius: 3px; border: 1px solid #ddd; }
-        .legend-line { width: 24px; height: 4px; margin-right: 8px; }
         .legend-icon { width: 20px; height: 20px; margin-right: 8px; display: flex; justify-content: center; align-items: center; }
 
         .canvas-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(180, 170, 160, 0.15);
-            width: 100%;
-            max-width: 1200px;
-            box-sizing: border-box;
-            overflow-x: auto;
+            background-color: white; padding: 20px; border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(180, 170, 160, 0.15); width: 100%; max-width: 1200px;
+            box-sizing: border-box; overflow-x: auto;
         }
-
         svg { width: 100%; height: auto; display: block; }
 
+        /* ====== 絕對零重疊 CAD 藍圖樣式 ====== */
         .dim-text { font-size: 15px; font-weight: bold; fill: #a39486; text-anchor: middle; dominant-baseline: middle; }
+        .leader-line { fill: none; stroke: #b0a092; stroke-width: 1.2; stroke-dasharray: 4, 4; opacity: 0.85; }
         
-        .leader-line {
-            fill: none;
-            stroke: #b0a092;
-            stroke-width: 1.2;
-            stroke-dasharray: 4, 4;
-            opacity: 0.85;
-        }
-
-        .label-text {
-            font-size: 13px;
-            font-weight: bold;
-            dominant-baseline: middle;
-        }
+        /* 拔除 text-shadow 白邊，維持文字純粹乾淨 */
+        .label-text { font-size: 13px; font-weight: bold; dominant-baseline: middle; }
         
-        g[id^="layer-"] { transition: opacity 0.4s ease; }
-
+        g[id^="layer-"] { transition: opacity 0.3s ease; }
         @keyframes dash { to { stroke-dashoffset: -20; } }
         .flow-line { stroke-dasharray: 8 6; animation: dash 1.5s linear infinite; }
 
-        .mode-all #layer-ceiling .ceil-zone { fill-opacity: 0.1; stroke-opacity: 0.2; }
+        /* "綜合全圖" 透明度與層次優化 */
+        .mode-all #layer-ceiling .ceil-zone { fill-opacity: 0.08; stroke-opacity: 0.2; }
         .mode-all #layer-mep .pipe-line { opacity: 0.25; }
         .mode-all #layer-mep .flow-line { opacity: 0.8; }
         .mode-all #layer-furniture { opacity: 0.65; }
@@ -173,7 +113,7 @@
 
     <div class="header">
         <h1>北歐奶茶風 互動式分層施工圖</h1>
-        <p>🌟 全境水線重構版：衛浴天花板隱藏超薄電熱水器，實現熱水秒熱、全境零重疊藍圖！</p>
+        <p>📏 絕對零重疊 CAD 藍圖版：多軌道文字排版，資訊全開也不打架！</p>
     </div>
 
     <!-- Tabs -->
@@ -190,50 +130,27 @@
     <div class="legend-container" id="legend"></div>
 
     <div class="canvas-container">
-        <!-- 畫布四面極限擴張，設立專屬文字停放軌道 -->
+        <!-- 畫布上下擴大至 Y=-280 ~ Y=650，給予文字充足的三層停靠軌道 -->
         <svg viewBox="-200 -250 1600 950" xmlns="http://www.w3.org/2000/svg" id="master-svg" class="mode-all">
             
             <defs>
                 <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto"><path d="M9,0 L0,3 L9,6 z" fill="#b0a092" /></marker>
                 <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L9,3 L0,6 z" fill="#b0a092" /></marker>
                 <marker id="arrow-drain" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--pipe-drain)" /></marker>
-                
                 <marker id="arrow-ac" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L9,3 L0,6 z" fill="var(--mep-ac)" /></marker>
                 <marker id="arrow-fresh" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L9,3 L0,6 z" fill="var(--mep-fresh)" /></marker>
                 <marker id="arrow-flow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L9,3 L0,6 z" fill="var(--color-airflow)" /></marker>
                 <marker id="arrow-exhaust" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L9,3 L0,6 z" fill="var(--color-exhaust)" /></marker>
 
-                <pattern id="wood-floor" width="40" height="120" patternUnits="userSpaceOnUse">
-                    <rect width="40" height="120" fill="var(--floor-wood)"/>
-                    <line x1="0" y1="0" x2="0" y2="120" stroke="#ede5db" stroke-width="1"/>
-                    <line x1="0" y1="60" x2="40" y2="60" stroke="#ede5db" stroke-width="1"/>
-                </pattern>
-                <pattern id="tile-floor" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <rect width="40" height="40" fill="var(--floor-tile)"/>
-                    <rect width="40" height="40" fill="none" stroke="#e0d7cd" stroke-width="1"/>
-                </pattern>
-                <pattern id="concrete-pattern" width="10" height="10" patternUnits="userSpaceOnUse">
-                    <rect width="10" height="10" fill="var(--wet-wall)" />
-                    <circle cx="3" cy="3" r="1" fill="#a09388" />
-                </pattern>
-                <pattern id="orig-beam-pattern" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                    <rect width="20" height="20" fill="none"/>
-                    <line x1="0" y1="0" x2="0" y2="20" stroke="var(--orig-beam)" stroke-width="2" opacity="0.4"/>
-                </pattern>
-                
-                <linearGradient id="tv-glare" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#333;stop-opacity:1" />
-                    <stop offset="50%" style="stop-color:#2a2a2a;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#222;stop-opacity:1" />
-                </linearGradient>
-                <linearGradient id="water-heater" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#fff"/>
-                    <stop offset="100%" stop-color="#e0e0e0"/>
-                </linearGradient>
+                <pattern id="wood-floor" width="40" height="120" patternUnits="userSpaceOnUse"><rect width="40" height="120" fill="var(--floor-wood)"/><line x1="0" y1="0" x2="0" y2="120" stroke="#ede5db" stroke-width="1"/><line x1="0" y1="60" x2="40" y2="60" stroke="#ede5db" stroke-width="1"/></pattern>
+                <pattern id="tile-floor" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="var(--floor-tile)"/><rect width="40" height="40" fill="none" stroke="#e0d7cd" stroke-width="1"/></pattern>
+                <pattern id="concrete-pattern" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="var(--wet-wall)" /><circle cx="3" cy="3" r="1" fill="#a09388" /></pattern>
+                <pattern id="orig-beam-pattern" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="20" height="20" fill="none"/><line x1="0" y1="0" x2="0" y2="20" stroke="var(--orig-beam)" stroke-width="2" opacity="0.4"/></pattern>
+                <linearGradient id="tv-glare" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#333;stop-opacity:1" /><stop offset="50%" style="stop-color:#2a2a2a;stop-opacity:1" /><stop offset="100%" style="stop-color:#222;stop-opacity:1" /></linearGradient>
+                <linearGradient id="water-heater" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#e0e0e0"/></linearGradient>
 
                 <g id="sym-recessed"><circle cx="0" cy="0" r="8" fill="#fff" stroke="#e67e22" stroke-width="2"/><circle cx="0" cy="0" r="4" fill="#e67e22"/></g>
                 <g id="sym-ceiling"><circle cx="0" cy="0" r="25" fill="rgba(52, 152, 219, 0.1)" stroke="#3498db" stroke-width="2"/><circle cx="0" cy="0" r="4" fill="#3498db"/></g>
-                
                 <g id="sym-socket"><rect x="-6" y="-6" width="12" height="12" rx="2" fill="var(--elec-socket)" stroke="#fff" stroke-width="1"/><line x1="-2" y1="-2" x2="-2" y2="2" stroke="#fff" stroke-width="1.5" /><line x1="2" y1="-2" x2="2" y2="2" stroke="#fff" stroke-width="1.5" /></g>
                 <g id="sym-switch"><circle cx="0" cy="0" r="7" fill="var(--elec-switch)" stroke="#fff" stroke-width="1.5"/><circle cx="0" cy="0" r="2" fill="#fff"/></g>
                 <g id="sym-network"><polygon points="0,-7 7,5 -7,5" fill="var(--elec-network)" stroke="#fff" stroke-width="1"/></g>
@@ -275,7 +192,6 @@
                     <rect x="94" y="400" width="926" height="4" />
                     <rect x="1110" y="0" width="4" height="310" />
                 </g>
-                
                 <rect x="94" y="350" width="1016" height="50" fill="url(#orig-beam-pattern)" class="orig-beam" />
                 <line x1="94" y1="350" x2="1110" y2="350" stroke="var(--orig-beam)" stroke-width="2" stroke-dasharray="8,4" class="orig-beam" />
 
@@ -289,63 +205,42 @@
                     <line x1="1110" y1="400" x2="1110" y2="310" stroke-width="4" stroke-linecap="round" />
                 </g>
 
-                <polyline points="250,375 250,560" class="leader-line"/>
-                <text x="250" y="570" class="label-text" fill="var(--orig-beam)" text-anchor="middle" style="font-size: 14px;">▍照片中的「原始結構大樑」位置</text>
+                <!-- 🌟 泥作右側標示 -->
+                <polyline points="996,157 1130,195 1145,195" class="leader-line"/>
+                <text x="1155" y="195" class="label-text" fill="#5c5046" text-anchor="start">15cm 共用水牆</text>
 
-                <polyline points="996,157 1130,115 1150,115" class="leader-line"/>
-                <text x="1160" y="115" class="label-text" fill="#5c5046" text-anchor="start">15cm 共用水牆</text>
-
-                <polyline points="1030,50 1130,85 1150,85" class="leader-line"/>
-                <text x="1160" y="85" class="label-text" fill="#5c5046" text-anchor="start">半高矮牆</text>
+                <polyline points="1030,50 1130,95 1145,95" class="leader-line"/>
+                <text x="1155" y="95" class="label-text" fill="#5c5046" text-anchor="start">半高矮牆</text>
             </g>
 
             <!-- ================= ② 水電空調與全境水線層 ================= -->
             <g id="layer-mep">
                 <rect x="1060" y="0" width="50" height="40" fill="#636e72" />
-                
-                <polyline points="1085,20 1130,15 1150,15" class="leader-line"/>
-                <text x="1160" y="15" class="label-text" fill="#636e72" text-anchor="start">大樓管道間 (冷水來源)</text>
-
-                <!-- 🌟 浴室天花板隱藏：雙人份超薄扁平電熱水器 -->
+                <!-- 浴室天花板隱藏熱水器 -->
                 <rect x="910" y="20" width="90" height="45" fill="url(#water-heater)" stroke="var(--pipe-hot)" stroke-width="2" rx="4" />
                 <line x1="910" y1="42.5" x2="1000" y2="42.5" stroke="#ccc" stroke-width="1" />
                 <circle cx="985" cy="30" r="4" fill="var(--pipe-hot)" />
                 <circle cx="985" cy="55" r="4" fill="var(--pipe-cold)" />
 
-                <!-- 🌟 管線路徑：全新動線 (熱水不再跨越全室) -->
                 <g class="pipe-line">
-                    <!-- 排水管 (不變) -->
                     <path d="M 905 30 L 1060 30" stroke="var(--pipe-drain)" stroke-width="5" fill="none" marker-end="url(#arrow-drain)" />
                     <path d="M 920 180 L 1080 180 L 1080 40" stroke="var(--pipe-drain)" stroke-width="4" fill="none" marker-end="url(#arrow-drain)" />
-                    
-                    <!-- 💙 冷水管 (供應熱水器、廚衛、洗衣機) -->
-                    <!-- 管道間 -> 衛浴分流 -> 扁平熱水器進水 -->
                     <path d="M 1060 15 L 1030 15 L 1030 55 L 985 55" stroke="var(--pipe-cold)" stroke-width="2" fill="none" stroke-linejoin="round" />
-                    <!-- 廚房與面盆冷水 -->
                     <path d="M 1030 15 L 1030 180 L 940 180" stroke="var(--pipe-cold)" stroke-width="2" fill="none" stroke-linejoin="round" />
-                    <!-- 跨室冷水 (僅保留單管供應陽台洗衣機，走下方假樑) -->
                     <path d="M 1030 180 L 1030 380 L 50 380 L 50 315" stroke="var(--pipe-cold)" stroke-width="2" fill="none" stroke-linejoin="round" stroke-dasharray="8 4" />
-                    
-                    <!-- ❤️ 熱水管 (從衛浴電熱水器出發 -> 極短距供應淋浴、面盆、廚房) -->
-                    <path d="M 985 30 L 1045 30 L 1045 170" stroke="var(--pipe-hot)" stroke-width="2" fill="none" stroke-linejoin="round" />
-                    <path d="M 1045 170 L 920 170" stroke="var(--pipe-hot)" stroke-width="2" fill="none" stroke-linejoin="round" />
-                    
-                    <!-- 冷氣冷凝排水 -->
+                    <path d="M 985 30 L 1045 30 L 1045 170 L 920 170" stroke="var(--pipe-hot)" stroke-width="2" fill="none" stroke-linejoin="round" />
                     <path d="M 47 380 L 94 340 L 880 340 L 1060 40" stroke="var(--pipe-acd)" stroke-width="3" stroke-dasharray="6,4" fill="none" />
                 </g>
                 
-                <!-- 設備方塊 -->
                 <rect x="15" y="190" width="60" height="70" fill="rgba(52, 152, 219, 0.2)" stroke="var(--mep-ac)" stroke-width="2" stroke-dasharray="4,2" rx="3" />
                 <rect x="180" y="340" width="90" height="20" fill="rgba(52, 152, 219, 0.4)" stroke="var(--mep-ac)" stroke-width="2" rx="2" />
                 <rect x="490" y="340" width="90" height="20" fill="rgba(52, 152, 219, 0.4)" stroke="var(--mep-ac)" stroke-width="2" rx="2" />
                 <rect x="15" y="330" width="60" height="40" fill="rgba(39, 174, 96, 0.2)" stroke="var(--mep-fresh)" stroke-width="2" stroke-dasharray="4,2" rx="3" />
-                
                 <path d="M 75 350 L 550 350" stroke="var(--mep-fresh)" stroke-width="5" fill="none" opacity="0.6" />
 
                 <!-- 氣流方向 -->
                 <path d="M 225 330 L 225 250" stroke="var(--mep-ac)" stroke-width="2" fill="none" marker-end="url(#arrow-ac)" stroke-dasharray="5 3" opacity="0.7" />
                 <path d="M 535 330 Q 535 150 700 150" stroke="var(--mep-ac)" stroke-width="2" fill="none" marker-end="url(#arrow-ac)" stroke-dasharray="10 5" opacity="0.7" />
-                
                 <rect x="295" y="347" width="40" height="6" fill="#fff" stroke="var(--mep-fresh)" stroke-width="1" />
                 <path d="M 315 340 L 315 300" stroke="var(--mep-fresh)" stroke-width="2" fill="none" marker-end="url(#arrow-fresh)" />
                 <rect x="400" y="347" width="40" height="6" fill="#fff" stroke="var(--mep-fresh)" stroke-width="1" />
@@ -366,38 +261,35 @@
                     <path d="M 850 100 Q 880 120 920 120" marker-end="url(#arrow-flow)" />
                 </g>
 
-                <!-- 🌟 空調與水線文字標示 -->
-                <!-- 右側軌道 -->
-                <polyline points="955,20 1130,-20 1150,-20" class="leader-line"/>
-                <text x="1160" y="-20" class="label-text" fill="var(--pipe-hot)" text-anchor="start">雙人份超薄扁平電熱水器 (隱藏於天花板)</text>
+                <!-- 🌟 MEP 右側標示 (絕對無重疊座標分配) -->
+                <polyline points="1085,20 1130,20 1145,20" class="leader-line"/>
+                <text x="1155" y="20" class="label-text" fill="#636e72" text-anchor="start">大樓管道間</text>
 
-                <polyline points="1045,170 1130,190 1150,190" class="leader-line"/>
-                <text x="1160" y="190" class="label-text" fill="var(--pipe-hot)" text-anchor="start">極短熱水管線 (免跨室，秒出熱水且省保溫材)</text>
+                <polyline points="980,70 1130,45 1145,45" class="leader-line"/>
+                <text x="1155" y="45" class="label-text" fill="var(--color-exhaust)" text-anchor="start">衛浴暖風排氣</text>
 
-                <polyline points="980,70 1130,55 1150,55" class="leader-line"/>
-                <text x="1160" y="55" class="label-text" fill="var(--color-exhaust)" text-anchor="start">衛浴暖風排氣</text>
+                <polyline points="1070,140 1130,220 1145,220" class="leader-line"/>
+                <text x="1155" y="220" class="label-text" fill="var(--color-exhaust)" text-anchor="start">抽油煙機排氣</text>
 
-                <!-- 左側軌道 -->
-                <polyline points="15,225 -20,225" class="leader-line"/>
-                <text x="-30" y="225" class="label-text" fill="var(--mep-ac)" text-anchor="end">室外機疊放</text>
+                <polyline points="955,20 1130,-30 1145,-30" class="leader-line"/>
+                <text x="1155" y="-30" class="label-text" fill="var(--pipe-hot)" text-anchor="start">隱藏式扁平電熱水器</text>
+
+                <polyline points="1045,170 1130,245 1145,245" class="leader-line"/>
+                <text x="1155" y="245" class="label-text" fill="var(--pipe-hot)" text-anchor="start">極短熱水管 (免跨室)</text>
+
+                <!-- 🌟 MEP 左側標示 -->
+                <polyline points="15,225 -20,160 -30,160" class="leader-line"/>
+                <text x="-40" y="160" class="label-text" fill="var(--mep-ac)" text-anchor="end">室外機疊放處</text>
                 
-                <polyline points="15,350 -20,350" class="leader-line"/>
-                <text x="-30" y="350" class="label-text" fill="var(--mep-fresh)" text-anchor="end">新風主機</text>
+                <polyline points="15,350 -20,280 -30,280" class="leader-line"/>
+                <text x="-40" y="280" class="label-text" fill="var(--mep-fresh)" text-anchor="end">新風主機</text>
 
-                <polyline points="50,380 -20,400" class="leader-line"/>
-                <text x="-30" y="400" class="label-text" fill="var(--pipe-cold)" text-anchor="end">冷水單管走下方假樑至洗衣機</text>
-
-                <!-- 下方軌道 -->
-                <polyline points="225,340 225,480" class="leader-line"/>
-                <text x="225" y="490" class="label-text" fill="var(--mep-ac)" text-anchor="middle">主臥冷氣</text>
-
-                <polyline points="535,340 535,480" class="leader-line"/>
-                <text x="535" y="490" class="label-text" fill="var(--mep-ac)" text-anchor="middle">客廳冷氣</text>
+                <polyline points="50,380 -20,340 -30,340" class="leader-line"/>
+                <text x="-40" y="340" class="label-text" fill="var(--pipe-cold)" text-anchor="end">冷水管走假樑</text>
             </g>
 
             <!-- ================= ③ 天花板與照明層 ================= -->
             <g id="layer-ceiling">
-                <!-- 假樑位於下方 (y=320~400) -->
                 <rect x="94" y="0" width="786" height="320" fill="var(--ceil-28)" stroke="#e0e0e0" stroke-width="1" class="ceil-zone" opacity="0.8"/>
                 <rect x="880" y="0" width="230" height="400" fill="url(#hatch-24)" stroke="#b8b0a6" stroke-width="2" class="ceil-zone" opacity="0.8"/>
                 <rect x="94" y="320" width="786" height="80" fill="var(--ceil-26)" stroke="#cbbab5" stroke-width="2" class="ceil-zone" opacity="0.9"/>
@@ -407,22 +299,14 @@
                 <use href="#sym-recessed" x="930" y="40" /> <use href="#sym-recessed" x="990" y="40" />
                 <use href="#sym-recessed" x="980" y="200" /> <use href="#sym-recessed" x="1050" y="200" />
                 <use href="#sym-recessed" x="980" y="280" /> <use href="#sym-recessed" x="1050" y="280" />
-                
                 <path d="M 94 315 L 880 315" fill="none" stroke="#f1c40f" stroke-width="4" stroke-dasharray="6,4" />
 
-                <!-- 天花板文字標示 -->
-                <polyline points="995,200 1130,225 1150,225" class="leader-line"/>
-                <text x="1160" y="225" class="label-text" fill="#8c7f75" text-anchor="start">H=2.4m 平釘區 (內藏熱水器)</text>
+                <!-- 🌟 天花板標示 -->
+                <polyline points="995,200 1130,170 1145,170" class="leader-line"/>
+                <text x="1155" y="170" class="label-text" fill="#8c7f75" text-anchor="start">H=2.4m 平釘區</text>
                 
-                <polyline points="910,65 1130,115 1150,115" class="leader-line"/>
-                <text x="1160" y="115" class="label-text" fill="#8c7f75" text-anchor="start">電熱水器預留維修孔</text>
-
-                <polyline points="244,160 244,-100" class="leader-line"/>
-                <text x="244" y="-110" class="label-text" fill="#8c7f75" text-anchor="middle">H=2.8m 原始挑高保留區</text>
-
-                <!-- 下方軌道停點 -->
-                <polyline points="340,360 340,510" class="leader-line"/>
-                <text x="340" y="520" class="label-text" fill="#8c7f75" text-anchor="middle">H=2.6m 下方包管假樑</text>
+                <polyline points="910,65 1130,145 1145,145" class="leader-line"/>
+                <text x="1155" y="145" class="label-text" fill="#8c7f75" text-anchor="start">熱水器維修孔</text>
             </g>
 
             <!-- ================= ④ 系統櫃與設備層 ================= -->
@@ -439,7 +323,6 @@
                 <circle cx="1055" cy="195" r="10" fill="none" stroke="#aaa" stroke-width="2" />
                 <circle cx="1085" cy="195" r="10" fill="none" stroke="#aaa" stroke-width="2" />
 
-                <!-- 床頭上櫃移至上方 -->
                 <rect x="154" y="0" width="160" height="45" fill="var(--furn-wood-dark)" />
                 <rect x="94" y="330" width="290" height="70" fill="var(--furn-wardrobe)" />
                 
@@ -448,7 +331,6 @@
                 <line x1="505" y1="360" x2="505" y2="400" stroke="#bda38b" stroke-width="1" />
                 <line x1="565" y1="360" x2="565" y2="400" stroke="#bda38b" stroke-width="1" />
 
-                <!-- TV S90F -->
                 <g transform="translate(462.5, 277)">
                     <rect x="50" y="80" width="45" height="3" fill="#333" />
                     <rect x="0" y="0" width="145" height="83" fill="var(--tv-screen)" stroke="var(--tv-frame)" stroke-width="1" rx="1" />
@@ -461,31 +343,6 @@
                 <rect x="400" y="360" width="45" height="40" fill="var(--furn-wood)" />
                 <rect x="880" y="360" width="70" height="40" fill="var(--furn-wood-dark)" />
                 <rect x="950" y="360" width="70" height="40" fill="var(--furn-wood)" />
-
-                <!-- 櫃體文字標示 -->
-                <polyline points="540,15 540,-130 540,-130" class="leader-line"/>
-                <text x="540" y="-140" class="label-text" fill="#5c5046" text-anchor="middle">沙發背櫃</text>
-                
-                <polyline points="200,45 200,-130" class="leader-line"/>
-                <text x="200" y="-140" class="label-text" fill="#5c5046" text-anchor="middle">床頭上櫃</text>
-
-                <polyline points="280,365 280,510" class="leader-line"/>
-                <text x="280" y="520" class="label-text" fill="#5c5046" text-anchor="middle">系統大衣櫃 (化解樑壓頂)</text>
-
-                <polyline points="422,380 422,480" class="leader-line"/>
-                <text x="422" y="490" class="label-text" fill="#5c5046" text-anchor="middle">書櫃</text>
-
-                <polyline points="580,380 580,510" class="leader-line"/>
-                <text x="580" y="520" class="label-text" fill="#5c5046" text-anchor="middle">電視長櫃</text>
-                
-                <polyline points="480,277 480,540" class="leader-line"/>
-                <text x="480" y="550" class="label-text" fill="#5c5046" text-anchor="middle">65" OLED & 音響</text>
-                
-                <polyline points="915,380 915,480" class="leader-line"/>
-                <text x="915" y="490" class="label-text" fill="#5c5046" text-anchor="middle">家電櫃</text>
-
-                <polyline points="985,380 985,480" class="leader-line"/>
-                <text x="985" y="490" class="label-text" fill="#5c5046" text-anchor="middle">鞋櫃</text>
             </g>
 
             <!-- ================= ⑤ 軟裝與家具層 ================= -->
@@ -511,158 +368,197 @@
                 <circle cx="47.5" cy="315" r="20" fill="#d4cec8" />
                 <rect x="820" y="336" width="56" height="64" fill="#bdc3c7" stroke="#7f8c8d" rx="2" />
 
-                <!-- 家具文字標示 -->
-                <polyline points="124,22 124,-100 124,-100" class="leader-line"/>
-                <text x="124" y="-110" class="label-text" fill="#5c5046" text-anchor="middle">化妝台</text>
-
-                <polyline points="720,40 720,-130 720,-130" class="leader-line"/>
-                <text x="720" y="-140" class="label-text" fill="#5c5046" text-anchor="middle">NORDEN 折疊桌</text>
-
-                <polyline points="234,150 150,250 150,540" class="leader-line"/>
-                <text x="150" y="550" class="label-text" fill="#5c5046" text-anchor="middle">Queen Size 雙人床</text>
-
-                <polyline points="620,105 700,250 700,540" class="leader-line"/>
-                <text x="700" y="550" class="label-text" fill="#5c5046" text-anchor="middle">沙發床展開範圍</text>
-
-                <polyline points="848,365 880,510" class="leader-line"/>
-                <text x="880" y="520" class="label-text" fill="#5c5046" text-anchor="middle">LG 金屬銀冰箱</text>
-
-                <polyline points="47,315 -20,315" class="leader-line"/>
-                <text x="-30" y="315" class="label-text" fill="#5c5046" text-anchor="end">洗衣機</text>
+                <!-- 🌟 左側家具標示 -->
+                <polyline points="47,315 -20,220 -30,220" class="leader-line"/>
+                <text x="-40" y="220" class="label-text" fill="#5c5046" text-anchor="end">洗衣機</text>
             </g>
 
             <!-- ================= ⑥ 插座與弱電層 ================= -->
             <g id="layer-electrical">
-                <text x="550" y="-220" class="label-text" fill="#d35400" text-anchor="middle" style="font-size: 15px;">💡 【全室用電安全升級：熱水器與高功率設備皆配置獨立迴路】</text>
-
-                <!-- 🌟 總電箱 (配電盤) 配置 -->
                 <use href="#sym-panel" x="985" y="400"/>
-                <polyline points="985,400 985,590 1055,600" class="leader-line"/>
-                <text x="1055" y="600" class="label-text" fill="var(--elec-panel)" text-anchor="middle">總電箱/配電盤</text>
-
-                <!-- 【右側軌道 - 衛浴與廚房】 -->
                 <use href="#sym-switch" x="1090" y="380"/>
-                <polyline points="1090,380 1130,380 1150,380" class="leader-line"/>
-                <text x="1160" y="380" class="label-text" fill="#d35400" text-anchor="start">一鍵斷電開關</text>
-                
                 <use href="#sym-camera" x="1095" y="260"/>
-                <polyline points="1095,260 1130,260 1150,260" class="leader-line"/>
-                <text x="1160" y="260" class="label-text" fill="#8e44ad" text-anchor="start">PoE監視器</text>
-
-                <use href="#sym-water" x="975" y="195"/>
-                <use href="#sym-socket" x="985" y="205"/>
-                <polyline points="975,195 1130,250 1150,250" class="leader-line"/>
-                <text x="1160" y="250" class="label-text" fill="#00cec9" text-anchor="start">櫥下濾水器</text>
-
+                <use href="#sym-water" x="975" y="195"/> <use href="#sym-socket" x="985" y="205"/>
                 <use href="#sym-socket" x="1070" y="170"/>
-                <polyline points="1070,170 1130,165 1150,165" class="leader-line"/>
-                <text x="1160" y="165" class="label-text" fill="#d35400" text-anchor="start">IH爐 (220V獨立)</text>
-
-                <!-- 🌟 新增：電熱水器專用電源 -->
-                <use href="#sym-socket" x="980" y="40"/>
-                <polyline points="980,40 1130,-45 1150,-45" class="leader-line"/>
-                <text x="1160" y="-45" class="label-text" fill="var(--elec-panel)" text-anchor="start">220V 電熱水器獨立迴路 (防漏電)</text>
-
                 <use href="#sym-socket" x="915" y="50"/>
-                <polyline points="915,50 1130,135 1150,135" class="leader-line"/>
-                <text x="1160" y="135" class="label-text" fill="#d35400" text-anchor="start">免治馬桶座</text>
-
                 <use href="#sym-socket" x="945" y="15"/>
-                <polyline points="945,15 1130,0 1150,0" class="leader-line"/>
-                <text x="1160" y="0" class="label-text" fill="#d35400" text-anchor="start">智能鏡電源</text>
-
                 <use href="#sym-socket" x="965" y="15"/>
-                <polyline points="965,15 1130,20 1150,20" class="leader-line"/>
-                <text x="1160" y="20" class="label-text" fill="#d35400" text-anchor="start">吹風機專用</text>
-
                 <use href="#sym-heater" x="995" y="75"/>
-                <polyline points="995,75 1130,-70 1150,-70" class="leader-line"/>
-                <text x="1160" y="-70" class="label-text" fill="#d35400" text-anchor="start">五合一暖風機 (獨立迴路)</text>
-
-
-                <!-- 【下方軌道插座】 -->
+                <use href="#sym-socket" x="980" y="40"/>
+                
                 <use href="#sym-socket" x="1000" y="360"/>
-                <polyline points="1000,360 1000,560" class="leader-line"/>
-                <text x="1000" y="570" class="label-text" fill="#d35400" text-anchor="middle">鞋櫃擴香/掃地機</text>
-
                 <use href="#sym-socket" x="848" y="368"/>
-                <polyline points="848,368 820,560" class="leader-line"/>
-                <text x="820" y="570" class="label-text" fill="#d35400" text-anchor="middle">冰箱專用 (獨立迴路)</text>
-                
-                <use href="#sym-socket" x="915" y="360"/>
-                <use href="#sym-socket" x="930" y="360"/>
-                <polyline points="922,360 922,600" class="leader-line"/>
-                <text x="922" y="610" class="label-text" fill="#d35400" text-anchor="middle">家電雙獨立迴路</text>
-
-                <use href="#sym-socket" x="535" y="365"/>
-                <use href="#sym-network" x="555" y="365"/>
-                <polyline points="545,365 545,560" class="leader-line"/>
-                <text x="545" y="570" class="label-text" fill="#8e44ad" text-anchor="middle">電視影音/網路</text>
-
+                <use href="#sym-socket" x="915" y="360"/> <use href="#sym-socket" x="930" y="360"/>
+                <use href="#sym-socket" x="535" y="365"/> <use href="#sym-network" x="555" y="365"/>
                 <use href="#sym-socket" x="280" y="350"/>
-                <polyline points="280,350 280,560" class="leader-line"/>
-                <text x="280" y="570" class="label-text" fill="#d35400" text-anchor="middle">衣櫃除濕棒</text>
-                
                 <use href="#sym-socket" x="200" y="330"/>
-                <polyline points="200,330 100,600" class="leader-line"/>
-                <text x="100" y="610" class="label-text" fill="#d35400" text-anchor="middle">衣櫃內部感應燈</text>
 
-
-                <!-- 【上方軌道 - 客廳與主臥】 -->
                 <use href="#sym-socket" x="395" y="15"/>
-                <polyline points="395,15 395,-70 395,-70" class="leader-line"/>
-                <text x="395" y="-80" class="label-text" fill="#d35400" text-anchor="middle">沙發側 Type-C</text>
-
                 <use href="#sym-socket" x="450" y="60"/>
-                <polyline points="450,60 450,-70 450,-70" class="leader-line"/>
-                <text x="450" y="-80" class="label-text" fill="#d35400" text-anchor="middle">沙發中 Type-C</text>
-
                 <use href="#sym-socket" x="635" y="15"/>
-                <polyline points="635,15 635,-70 635,-70" class="leader-line"/>
-                <text x="635" y="-80" class="label-text" fill="#d35400" text-anchor="middle">沙發側 Type-C</text>
-
                 <use href="#sym-socket" x="655" y="15"/>
-                <polyline points="655,15 655,-100 655,-100" class="leader-line"/>
-                <text x="655" y="-110" class="label-text" fill="#d35400" text-anchor="middle">餐桌插座</text>
-
                 <use href="#sym-socket" x="755" y="15"/>
-                <polyline points="755,15 755,-70 755,-70" class="leader-line"/>
-                <text x="755" y="-80" class="label-text" fill="#d35400" text-anchor="middle">餐桌插座</text>
-
                 <use href="#sym-socket" x="105" y="15"/>
-                <polyline points="105,15 105,-130 105,-130" class="leader-line"/>
-                <text x="105" y="-140" class="label-text" fill="#d35400" text-anchor="middle">主臥智慧窗簾電源</text>
-
                 <use href="#sym-socket" x="390" y="15"/>
-                <polyline points="390,15 390,-130 390,-130" class="leader-line"/>
-                <text x="390" y="-140" class="label-text" fill="#d35400" text-anchor="middle">客廳智慧窗簾電源</text>
-
-                <use href="#sym-switch" x="170" y="20"/>
-                <use href="#sym-socket" x="185" y="20"/>
-                <polyline points="170,20 170,-70" class="leader-line"/>
-                <text x="170" y="-80" class="label-text" fill="#d35400" text-anchor="middle">雙切 + Type-C</text>
-
-                <use href="#sym-switch" x="300" y="20"/>
-                <use href="#sym-socket" x="285" y="20"/>
-                <polyline points="300,20 300,-70" class="leader-line"/>
-                <text x="300" y="-80" class="label-text" fill="#d35400" text-anchor="middle">雙切 + Type-C</text>
-
+                <use href="#sym-switch" x="170" y="20"/> <use href="#sym-socket" x="185" y="20"/>
+                <use href="#sym-switch" x="300" y="20"/> <use href="#sym-socket" x="285" y="20"/>
                 <use href="#sym-switch" x="380" y="130"/>
-                <polyline points="380,130 380,-100 365,-100" class="leader-line"/>
-                <text x="365" y="-110" class="label-text" fill="#d35400" text-anchor="middle">門口雙切</text>
 
-                <!-- 【左側陽台區】 -->
                 <use href="#sym-socket" x="25" y="320"/>
-                <polyline points="25,320 -20,400" class="leader-line"/>
-                <text x="-30" y="400" class="label-text" fill="#d35400" text-anchor="end">新風機電源</text>
-
                 <use href="#sym-socket" x="25" y="180"/>
-                <polyline points="25,180 -20,190" class="leader-line"/>
-                <text x="-30" y="190" class="label-text" fill="#d35400" text-anchor="end">室外機 220V</text>
-
                 <use href="#sym-socket" x="35" y="270"/>
-                <polyline points="35,270 -20,270" class="leader-line"/>
-                <text x="-30" y="270" class="label-text" fill="#d35400" text-anchor="end">洗脫烘 (獨立迴路)</text>
+
+                <!-- 🌟 右側弱電標示 -->
+                <polyline points="945,15 1130,-80 1145,-80" class="leader-line"/>
+                <text x="1155" y="-80" class="label-text" fill="#d35400" text-anchor="start">智能鏡電源</text>
+
+                <polyline points="965,15 1130,-55 1145,-55" class="leader-line"/>
+                <text x="1155" y="-55" class="label-text" fill="#d35400" text-anchor="start">吹風機專用</text>
+
+                <polyline points="980,40 1130,-5 1145,-5" class="leader-line"/>
+                <text x="1155" y="-5" class="label-text" fill="var(--elec-panel)" text-anchor="start">220V 電熱水器迴路</text>
+
+                <polyline points="995,75 1130,70 1145,70" class="leader-line"/>
+                <text x="1155" y="70" class="label-text" fill="#d35400" text-anchor="start">五合一暖風機</text>
+
+                <polyline points="915,50 1130,120 1145,120" class="leader-line"/>
+                <text x="1155" y="120" class="label-text" fill="#d35400" text-anchor="start">免治馬桶座</text>
+
+                <polyline points="1070,170 1130,245 1145,245" class="leader-line"/>
+                <text x="1155" y="245" class="label-text" fill="#d35400" text-anchor="start">IH爐 (220V)</text>
+
+                <polyline points="975,195 1130,270 1145,270" class="leader-line"/>
+                <text x="1155" y="270" class="label-text" fill="#00cec9" text-anchor="start">櫥下濾水器</text>
+
+                <polyline points="1095,260 1130,295 1145,295" class="leader-line"/>
+                <text x="1155" y="295" class="label-text" fill="#8e44ad" text-anchor="start">PoE監視器</text>
+
+                <polyline points="1090,380 1130,320 1145,320" class="leader-line"/>
+                <text x="1155" y="320" class="label-text" fill="#d35400" text-anchor="start">一鍵斷電開關</text>
+
+                <!-- 🌟 左側弱電標示 -->
+                <polyline points="25,180 -20,190 -30,190" class="leader-line"/>
+                <text x="-40" y="190" class="label-text" fill="#d35400" text-anchor="end">室外機 220V</text>
+
+                <polyline points="35,270 -20,250 -30,250" class="leader-line"/>
+                <text x="-40" y="250" class="label-text" fill="#d35400" text-anchor="end">洗脫烘 110V</text>
+
+                <polyline points="25,320 -20,310 -30,310" class="leader-line"/>
+                <text x="-40" y="310" class="label-text" fill="#d35400" text-anchor="end">新風機電源</text>
+
+            </g>
+
+            <!-- ================= 全域無重疊指引線層 (上與下) ================= -->
+            <g id="layer-global-leaders">
+                <!-- 🌟 頂部軌道 (Top Lane) - 絕對錯開 -->
+                <polyline points="124,22 100,-140" class="leader-line"/>
+                <text x="100" y="-150" class="label-text" fill="#5c5046" text-anchor="middle">化妝台</text>
+
+                <polyline points="105,15 170,-110" class="leader-line"/>
+                <text x="170" y="-120" class="label-text" fill="#d35400" text-anchor="middle">主臥智慧窗簾</text>
+
+                <polyline points="170,20 230,-140" class="leader-line"/>
+                <text x="230" y="-150" class="label-text" fill="#d35400" text-anchor="middle">雙切+TypeC</text>
+
+                <polyline points="244,160 250,-80" class="leader-line"/>
+                <text x="250" y="-90" class="label-text" fill="#8c7f75" text-anchor="middle">H=2.8m 挑高區</text>
+
+                <polyline points="300,20 280,-110" class="leader-line"/>
+                <text x="280" y="-120" class="label-text" fill="#d35400" text-anchor="middle">雙切+TypeC</text>
+
+                <polyline points="390,15 330,-140" class="leader-line"/>
+                <text x="330" y="-150" class="label-text" fill="#d35400" text-anchor="middle">客廳智慧窗簾</text>
+
+                <polyline points="380,130 380,-170 360,-170" class="leader-line"/>
+                <text x="360" y="-180" class="label-text" fill="#d35400" text-anchor="middle">門口雙切</text>
+
+                <polyline points="395,15 400,-110" class="leader-line"/>
+                <text x="400" y="-120" class="label-text" fill="#d35400" text-anchor="middle">沙發左側</text>
+
+                <polyline points="450,60 470,-140" class="leader-line"/>
+                <text x="470" y="-150" class="label-text" fill="#d35400" text-anchor="middle">沙發中側</text>
+
+                <polyline points="540,15 540,-110" class="leader-line"/>
+                <text x="540" y="-120" class="label-text" fill="#5c5046" text-anchor="middle">沙發背櫃</text>
+
+                <polyline points="635,15 610,-110" class="leader-line"/>
+                <text x="610" y="-120" class="label-text" fill="#d35400" text-anchor="middle">沙發右側</text>
+
+                <polyline points="655,15 680,-140" class="leader-line"/>
+                <text x="680" y="-150" class="label-text" fill="#d35400" text-anchor="middle">餐桌左插座</text>
+
+                <polyline points="720,40 750,-140" class="leader-line"/>
+                <text x="750" y="-150" class="label-text" fill="#5c5046" text-anchor="middle">NORDEN 桌</text>
+
+                <polyline points="755,15 820,-110" class="leader-line"/>
+                <text x="820" y="-120" class="label-text" fill="#d35400" text-anchor="middle">餐桌右插座</text>
+
+                <!-- 🌟 底部軌道 (Bottom Lane) - 精密排列保證無交叉 -->
+                <!-- Row 1: y=490 -->
+                <polyline points="200,45 150,480" class="leader-line"/>
+                <text x="150" y="490" class="label-text" fill="#5c5046" text-anchor="middle">床頭上櫃</text>
+
+                <polyline points="280,350 300,480" class="leader-line"/>
+                <text x="300" y="490" class="label-text" fill="#d35400" text-anchor="middle">衣櫃除濕棒</text>
+
+                <polyline points="422,380 420,480" class="leader-line"/>
+                <text x="420" y="490" class="label-text" fill="#5c5046" text-anchor="middle">書櫃</text>
+
+                <polyline points="535,340 550,480" class="leader-line"/>
+                <text x="550" y="490" class="label-text" fill="var(--mep-ac)" text-anchor="middle">客廳冷氣</text>
+
+                <polyline points="545,365 680,480" class="leader-line"/>
+                <text x="680" y="490" class="label-text" fill="#8e44ad" text-anchor="middle">電視網路總成</text>
+
+                <polyline points="848,368 800,480" class="leader-line"/>
+                <text x="800" y="490" class="label-text" fill="#d35400" text-anchor="middle">冰箱插座</text>
+
+                <polyline points="922,360 920,480" class="leader-line"/>
+                <text x="920" y="490" class="label-text" fill="#d35400" text-anchor="middle">家電雙迴路</text>
+
+                <polyline points="985,400 1040,480" class="leader-line"/>
+                <text x="1040" y="490" class="label-text" fill="var(--elec-panel)" text-anchor="middle">總電箱</text>
+
+                <!-- Row 2: y=530 -->
+                <polyline points="200,330 100,520" class="leader-line"/>
+                <text x="100" y="530" class="label-text" fill="#d35400" text-anchor="middle">衣櫃感應燈</text>
+
+                <polyline points="225,340 225,520" class="leader-line"/>
+                <text x="225" y="530" class="label-text" fill="var(--mep-ac)" text-anchor="middle">主臥冷氣</text>
+
+                <polyline points="280,365 360,520" class="leader-line"/>
+                <text x="360" y="530" class="label-text" fill="#5c5046" text-anchor="middle">系統大衣櫃</text>
+
+                <polyline points="480,277 480,520" class="leader-line"/>
+                <text x="480" y="530" class="label-text" fill="#5c5046" text-anchor="middle">65" OLED</text>
+
+                <polyline points="580,380 590,520" class="leader-line"/>
+                <text x="590" y="530" class="label-text" fill="#5c5046" text-anchor="middle">電視長櫃</text>
+
+                <polyline points="620,105 720,520" class="leader-line"/>
+                <text x="720" y="530" class="label-text" fill="#5c5046" text-anchor="middle">沙發床展開</text>
+
+                <polyline points="848,365 850,520" class="leader-line"/>
+                <text x="850" y="530" class="label-text" fill="#5c5046" text-anchor="middle">LG 冰箱</text>
+
+                <polyline points="915,380 960,520" class="leader-line"/>
+                <text x="960" y="530" class="label-text" fill="#5c5046" text-anchor="middle">家電櫃</text>
+
+                <polyline points="985,380 1080,520" class="leader-line"/>
+                <text x="1080" y="530" class="label-text" fill="#5c5046" text-anchor="middle">鞋櫃</text>
+
+                <!-- Row 3: y=570 -->
+                <polyline points="234,150 180,560" class="leader-line"/>
+                <text x="180" y="570" class="label-text" fill="#5c5046" text-anchor="middle">Queen Size床</text>
+
+                <polyline points="340,360 310,560" class="leader-line"/>
+                <text x="310" y="570" class="label-text" fill="#8c7f75" text-anchor="middle">H=2.6m假樑</text>
+
+                <polyline points="250,375 250,560 440,560" class="leader-line"/>
+                <text x="440" y="570" class="label-text" fill="var(--orig-beam)" text-anchor="middle">原始結構大樑</text>
+
+                <polyline points="1000,360 1000,560" class="leader-line"/>
+                <text x="1000" y="570" class="label-text" fill="#d35400" text-anchor="middle">鞋櫃掃地機</text>
             </g>
 
         </svg>
@@ -708,17 +604,17 @@
                 <div class="legend-item"><svg class="legend-icon"><polygon points="10,3 17,15 3,15" fill="#8e44ad"/></svg> 弱電 (RJ45/監視器)</div>
                 <div class="legend-item"><svg class="legend-icon"><path d="M10,4 Q15,10 15,14 A5,5 0 0 1 5,14 Q5,10 10,4 Z" fill="#00cec9"/></svg> 濾水器專用</div>
                 <div class="legend-item"><svg class="legend-icon"><rect x="-4" y="-4" width="12" height="12" fill="none" stroke="#e74c3c" stroke-width="1.5"/><circle cx="2" cy="2" r="3" fill="#e74c3c"/><path d="M-2,-2 L6,6 M6,-2 L-2,6" stroke="#e74c3c" stroke-width="1"/></svg> 五合一暖風機</div>
-                <div class="legend-item"><svg class="legend-icon"><rect x="4" y="2" width="12" height="16" fill="#fff" stroke="#c0392b" stroke-width="2"/><line x1="4" y1="2" x2="16" y2="18" stroke="#c0392b" stroke-width="1.5"/></svg> 總電箱/配電盤</div>
+                <div class="legend-item"><svg class="legend-icon"><rect x="4" y="2" width="12" height="16" fill="#fff" stroke="#c0392b" stroke-width="2"/><line x1="4" y1="2" x2="16" y2="18" stroke="#c0392b" stroke-width="1.5"/></svg> 總電箱 (配電盤)</div>
             `,
             all: `
                 <div class="legend-item"><div class="legend-box" style="background: linear-gradient(135deg, #fff, #e0e0e0); border: 2px solid var(--pipe-hot);"></div>隱藏式電熱水器</div>
                 <div class="legend-item"><div class="legend-box" style="background: rgba(241, 196, 15, 0.3); border: 1px dashed #d35400;"></div>H=2.6m 包覆假樑</div>
                 <div class="legend-item"><svg class="legend-icon"><rect x="4" y="2" width="12" height="16" fill="#fff" stroke="#c0392b" stroke-width="2"/><line x1="4" y1="2" x2="16" y2="18" stroke="#c0392b" stroke-width="1.5"/></svg> 總電箱 (配電盤)</div>
-                <div class="legend-item"><svg class="legend-icon"><line x1="2" y1="10" x2="18" y2="10" stroke="#a39486" stroke-width="1.5" stroke-dasharray="4,4"/></svg> 軌道化指引線</div>
+                <div class="legend-item"><svg class="legend-icon"><line x1="2" y1="10" x2="18" y2="10" stroke="#a39486" stroke-width="1.5" stroke-dasharray="4,4"/></svg> 多軌道指引線 (100%零重疊)</div>
             `
         };
 
-        const layers = ['masonry', 'mep', 'ceiling', 'cabinetry', 'furniture', 'electrical'];
+        const layers = ['masonry', 'mep', 'ceiling', 'cabinetry', 'furniture', 'electrical', 'global-leaders'];
         const svgElement = document.getElementById('master-svg');
         const legendContainer = document.getElementById('legend');
 
@@ -734,21 +630,29 @@
                 if(selectedLayer === 'all') {
                     svgElement.classList.add('mode-all');
                     layers.forEach(layer => {
-                        document.getElementById('layer-' + layer).style.opacity = '1';
-                        document.getElementById('layer-' + layer).style.display = 'inline';
+                        const el = document.getElementById('layer-' + layer);
+                        if (el) {
+                            el.style.opacity = '1';
+                            el.style.display = 'inline';
+                        }
                     });
                 } else {
                     svgElement.classList.remove('mode-all');
                     layers.forEach(layer => {
                         const el = document.getElementById('layer-' + layer);
-                        if(layer === selectedLayer) {
-                            el.style.display = 'inline';
-                            setTimeout(() => el.style.opacity = '1', 50); 
-                        } else {
-                            el.style.opacity = '0';
-                            setTimeout(() => el.style.display = 'none', 300); 
+                        if (el) {
+                            if(layer === selectedLayer) {
+                                el.style.display = 'inline';
+                                setTimeout(() => el.style.opacity = '1', 50); 
+                            } else {
+                                el.style.opacity = '0';
+                                setTimeout(() => el.style.display = 'none', 300); 
+                            }
                         }
                     });
+                    // Force hide global leaders when not in 'all' mode to keep individual modes clean
+                    const gl = document.getElementById('layer-global-leaders');
+                    if (gl) { gl.style.opacity = '0'; setTimeout(() => gl.style.display = 'none', 300); }
                 }
 
                 updateLegend(selectedLayer);

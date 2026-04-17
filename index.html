@@ -15,6 +15,7 @@
             
             --furn-wood: #e3d1be;
             --furn-wood-dark: #ccb7a1;
+            --furn-kitchen: #d5c1ab;
             --furn-sofa: #dfd5c9; 
             --furn-bed: #fdfcf9;
             --furn-wardrobe: #d9cabd;
@@ -65,6 +66,7 @@
         .legend-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; max-width: 1200px; min-height: 24px; transition: opacity 0.3s ease; }
         .legend-item { display: flex; align-items: center; font-size: 13px; font-weight: 600; color: #444; }
         .legend-box { width: 18px; height: 18px; margin-right: 8px; border-radius: 3px; border: 1px solid #ddd; }
+        .legend-line { width: 20px; height: 4px; margin-right: 8px; border-radius: 2px; }
         .legend-icon { width: 20px; height: 20px; margin-right: 8px; display: flex; justify-content: center; align-items: center; }
 
         .canvas-container { background-color: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 40px rgba(180, 170, 160, 0.15); width: 100%; max-width: 1200px; box-sizing: border-box; overflow-x: auto; }
@@ -78,6 +80,10 @@
         g[id^="layer-"] { transition: opacity 0.3s ease; }
         @keyframes dash { to { stroke-dashoffset: -20; } }
         .flow-line { stroke-dasharray: 8 6; animation: dash 1.5s linear infinite; }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { animation: none !important; transition: none !important; }
+        }
 
         /* "綜合全圖" 透明度與層次優化 */
         .mode-all #layer-ceiling .ceil-zone { fill-opacity: 0.08; stroke-opacity: 0.2; }
@@ -623,44 +629,44 @@
         };
 
         const layers = ['masonry', 'mep', 'ceiling', 'cabinetry', 'furniture', 'electrical', 'global-leaders'];
+        const layerElements = Object.fromEntries(
+            layers.map(layer => [layer, document.getElementById('layer-' + layer)]).filter(([, el]) => el)
+        );
+        const tabsElement = document.getElementById('tabs');
+        const tabButtons = tabsElement.querySelectorAll('.tab-btn');
         const svgElement = document.getElementById('master-svg');
         const legendContainer = document.getElementById('legend');
+        let currentLayer = 'all';
 
         updateLegend('all');
 
-        document.getElementById('tabs').addEventListener('click', function(e) {
-            if(e.target.classList.contains('tab-btn')) {
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
+        tabsElement.addEventListener('click', function(e) {
+            const button = e.target.closest('.tab-btn');
+            if(button) {
+                const selectedLayer = button.getAttribute('data-layer');
+                if (!selectedLayer || selectedLayer === currentLayer) return;
+                currentLayer = selectedLayer;
 
-                const selectedLayer = e.target.getAttribute('data-layer');
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
 
-                if(selectedLayer === 'all') {
+                if (selectedLayer === 'all') {
                     svgElement.classList.add('mode-all');
-                    layers.forEach(layer => {
-                        const el = document.getElementById('layer-' + layer);
-                        if (el) {
-                            el.style.opacity = '1';
-                            el.style.display = 'inline';
-                        }
+                    Object.values(layerElements).forEach((el) => {
+                        el.style.display = 'inline';
+                        requestAnimationFrame(() => { el.style.opacity = '1'; });
                     });
                 } else {
                     svgElement.classList.remove('mode-all');
-                    layers.forEach(layer => {
-                        const el = document.getElementById('layer-' + layer);
-                        if (el) {
-                            if(layer === selectedLayer) {
-                                el.style.display = 'inline';
-                                setTimeout(() => el.style.opacity = '1', 50); 
-                            } else {
-                                el.style.opacity = '0';
-                                setTimeout(() => el.style.display = 'none', 300); 
-                            }
+                    Object.entries(layerElements).forEach(([layer, el]) => {
+                        if (layer === selectedLayer) {
+                            el.style.display = 'inline';
+                            requestAnimationFrame(() => { el.style.opacity = '1'; });
+                        } else {
+                            el.style.opacity = '0';
+                            setTimeout(() => { el.style.display = 'none'; }, 300);
                         }
                     });
-                    
-                    const gl = document.getElementById('layer-global-leaders');
-                    if (gl) { gl.style.opacity = '0'; setTimeout(() => gl.style.display = 'none', 300); }
                 }
 
                 updateLegend(selectedLayer);

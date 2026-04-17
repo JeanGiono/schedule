@@ -636,6 +636,10 @@
         const tabButtons = tabsElement.querySelectorAll('.tab-btn');
         const svgElement = document.getElementById('master-svg');
         const legendContainer = document.getElementById('legend');
+        const TRANSITION_MS = 300;
+        const LEGEND_FADE_MS = 200;
+        const hideTimers = new Map();
+        let legendTimer = null;
         let currentLayer = 'all';
 
         updateLegend('all');
@@ -652,19 +656,14 @@
 
                 if (selectedLayer === 'all') {
                     svgElement.classList.add('mode-all');
-                    Object.values(layerElements).forEach((el) => {
-                        el.style.display = 'inline';
-                        requestAnimationFrame(() => { el.style.opacity = '1'; });
-                    });
+                    Object.values(layerElements).forEach(showLayer);
                 } else {
                     svgElement.classList.remove('mode-all');
                     Object.entries(layerElements).forEach(([layer, el]) => {
                         if (layer === selectedLayer) {
-                            el.style.display = 'inline';
-                            requestAnimationFrame(() => { el.style.opacity = '1'; });
+                            showLayer(el);
                         } else {
-                            el.style.opacity = '0';
-                            setTimeout(() => { el.style.display = 'none'; }, 300);
+                            hideLayer(layer, el);
                         }
                     });
                 }
@@ -674,11 +673,45 @@
         });
 
         function updateLegend(mode) {
+            if (!legends[mode]) return;
+            if (legendTimer) {
+                clearTimeout(legendTimer);
+                legendTimer = null;
+            }
+
             legendContainer.style.opacity = '0';
-            setTimeout(() => {
-                legendContainer.innerHTML = legends[mode];
+            legendTimer = setTimeout(() => {
+                if (legendContainer.innerHTML !== legends[mode]) {
+                    legendContainer.innerHTML = legends[mode];
+                }
                 legendContainer.style.opacity = '1';
-            }, 200);
+            }, LEGEND_FADE_MS);
+        }
+
+        function showLayer(el) {
+            if (!el) return;
+            const layerKey = el.id.replace('layer-', '');
+            const hideTimer = hideTimers.get(layerKey);
+            if (hideTimer) {
+                clearTimeout(hideTimer);
+                hideTimers.delete(layerKey);
+            }
+            el.style.display = 'inline';
+            requestAnimationFrame(() => { el.style.opacity = '1'; });
+        }
+
+        function hideLayer(layer, el) {
+            if (!el) return;
+            const pending = hideTimers.get(layer);
+            if (pending) {
+                clearTimeout(pending);
+            }
+            el.style.opacity = '0';
+            const timer = setTimeout(() => {
+                el.style.display = 'none';
+                hideTimers.delete(layer);
+            }, TRANSITION_MS);
+            hideTimers.set(layer, timer);
         }
     </script>
 </body>
